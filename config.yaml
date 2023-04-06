@@ -1,7 +1,7 @@
-train_path: /path/to/train/data
-valid_path: /path/to/valid/data
-save_path: /path/to/save/models
-type_model: cnn
+train_path: /content/content/Train
+valid_path: /content/content/Valid
+save_path: /content/save/
+type_model: "LeNet5"
 image_C: 3
 image_W: 224
 image_H: 224

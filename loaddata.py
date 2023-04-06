@@ -4,13 +4,15 @@ import torchvision.transforms as transforms
 
 class LoadData:
     def __init__(self, config):
-        super().__init__(config)
+        self.image_H=config.image_H
+        self.image_W=config.image_W
+        self.batch_size=config.batch_size
 
-    def load_data(self, data_path, config):
+    def load_data(self, data_path):
         transform = transforms.Compose([
-            transforms.Resize((config.image_H, config.image_W)),
+            transforms.Resize((self.image_H, self.image_W)),
             transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomCrop(size=(config.image_H, config.image_W), padding=4),
+            transforms.RandomCrop(size=(self.image_H, self.image_W), padding=4),
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465),(0.2470, 0.2435, 0.2616))
         ])
@@ -22,7 +24,7 @@ class LoadData:
 
         dataloader = torch.utils.data.DataLoader(
             dataset,
-            batch_size=config.batch_size,
+            batch_size=self.batch_size,
             shuffle=True,
             num_workers=2
         )

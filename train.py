@@ -9,4 +9,5 @@ args = parser.parse_args()
 
 config = get_config(args.config_file)
 
-task=Classify_task.training(config)
+task=Classify_task(config)
+task.training()
