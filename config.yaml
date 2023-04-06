@@ -1,0 +1,11 @@
+train_path: /path/to/train/data
+valid_path: /path/to/valid/data
+save_path: /path/to/save/models
+type_model: cnn
+image_C: 3
+image_W: 224
+image_H: 224
+num_classes: 15
+batch_size: 128
+learning_rate: 0.001
+num_epochs: 10
