@@ -28,7 +28,9 @@ class Classify_task:
       self.base_model = CNN_Model(config).to(self.device)
   
     def training(self):
-      
+        if not os.path.exists(self.save_path):
+          os.makedirs(self.save_path)
+
         train = self.load_data(data_path=self.train_path)
         valid = self.load_data(data_path=self.valid_path)
 
@@ -75,7 +77,7 @@ class Classify_task:
 
             print(f"Epoch {epoch + 1}/{self.num_epochs + initial_epoch}")
             print(f"Train Loss: {train_loss:.4f} Train Acc: {train_acc:.4f}")
-            print(f"Valid Loss: {valid_loss:.4f} Train Acc: {valid_acc:.4f}")
+            print(f"Valid Loss: {valid_loss:.4f} Valid Acc: {valid_acc:.4f}")
 
             # save the model state dict
             torch.save(self.base_model.state_dict(), os.path.join(self.save_path, 'last_model.pt'))
