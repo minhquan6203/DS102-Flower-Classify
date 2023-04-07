@@ -37,10 +37,11 @@ class Classify_task:
         best_valid_acc = 0.0
         loss_function = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.base_model.parameters(), lr=self.learning_rate)
-        if os.path.exists(os.path.join(self.save_path, 'last_model.pt')):
-            checkpoint = torch.load(os.path.join(self.save_path, 'last_model.pt'))
+        if os.path.exists(os.path.join(self.save_path, 'last_model.pth')):
+            checkpoint = torch.load(os.path.join(self.save_path, 'last_model.pth'))
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            valid_loss = checkpoint['valid_loss']
             print('Loaded the last saved model.')
             initial_epoch = checkpoint['epoch'] + 1
             print(f"continue training from epoch {initial_epoch}")
@@ -80,18 +81,34 @@ class Classify_task:
             print(f"Valid Loss: {valid_loss:.4f} Valid Acc: {valid_acc:.4f}")
 
             # save the model state dict
-            torch.save(self.base_model.state_dict(), os.path.join(self.save_path, 'last_model.pt'))
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': self.base_model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'valid_loss': valid_loss}, os.path.join(self.save_path, 'last_model.pth'))
 
             # save the best model
+            threshold=0
             if valid_acc > best_valid_acc:
                 best_valid_acc = valid_acc
-                torch.save(self.base_model.state_dict(), os.path.join(self.save_path, 'best_model.pt'))
+                torch.save({
+                'epoch': epoch,
+                'model_state_dict': self.base_model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'valid_loss': valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
                 print(f"Saved the best model with validation accuracy of {valid_acc:.4f}")
+            threshold=0
 
+
+            if epoch > 0 and valid_acc < best_valid_acc:
+              threshold+=1
+            else:
+              threshold=0
+            
             # early stopping
-            if epoch > 0 and valid_acc < prev_valid_acc:
+            if threshold>=5:
                 print(f"Early stopping after epoch {epoch + 1}")
                 break
 
-            prev_valid_acc = valid_acc
+            
     
