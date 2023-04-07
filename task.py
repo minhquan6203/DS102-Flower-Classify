@@ -34,24 +34,30 @@ class Classify_task:
         train = self.load_data(data_path=self.train_path)
         valid = self.load_data(data_path=self.valid_path)
 
-        best_valid_acc = 0.0
+        
         loss_function = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.base_model.parameters(), lr=self.learning_rate)
         if os.path.exists(os.path.join(self.save_path, 'last_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'last_model.pth'))
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            valid_loss = checkpoint['valid_loss']
+            valid_acc = checkpoint['valid_acc']
+            train_acc=checkpoint['train_acc']
+            train_loss=checkpoint['train_loss']
+            valid_loss=checkpoint['valid_loss']
             print('Loaded the last saved model.')
             initial_epoch = checkpoint['epoch'] + 1
             print(f"continue training from epoch {initial_epoch}")
         else:
             initial_epoch = 0
             print("first time training!!!")
+            valid_acc=0.
+            train_acc=0.
+            train_loss=0.
+            valid_loss=0.
             
-            
+        threshold=0
         for epoch in range(initial_epoch, self.num_epochs + initial_epoch):
-            train_loss, train_acc = 0, 0
             for images, labels in train:
                 images, labels = images.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
@@ -62,7 +68,6 @@ class Classify_task:
                 train_loss += loss.item()
                 train_acc += (output.argmax(1) == labels).sum().item() / labels.size(0)
 
-            valid_loss, valid_acc = 0, 0
             with torch.no_grad():
                 for images, labels in valid:
                     images, labels = images.to(self.device), labels.to(self.device)
@@ -85,25 +90,29 @@ class Classify_task:
                 'epoch': epoch,
                 'model_state_dict': self.base_model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'valid_loss': valid_loss}, os.path.join(self.save_path, 'last_model.pth'))
+                'valid_acc': valid_acc,
+                'train_acc':train_acc,
+                'train_loss':train_loss,
+                'valid_loss':valid_loss}, os.path.join(self.save_path, 'last_model.pth'))
 
             # save the best model
-            threshold=0
+            best_valid_acc = 0.0
+            if epoch > 0 and valid_acc < best_valid_acc:
+              threshold+=1
+            else:
+              threshold=0
+            
             if valid_acc > best_valid_acc:
                 best_valid_acc = valid_acc
                 torch.save({
                 'epoch': epoch,
                 'model_state_dict': self.base_model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'valid_loss': valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
+                'valid_loss': valid_loss,
+                'train_acc':train_acc,
+                'train_loss':train_loss,
+                'valid_loss':valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
                 print(f"Saved the best model with validation accuracy of {valid_acc:.4f}")
-            threshold=0
-
-
-            if epoch > 0 and valid_acc < best_valid_acc:
-              threshold+=1
-            else:
-              threshold=0
             
             # early stopping
             if threshold>=5:
