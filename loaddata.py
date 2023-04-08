@@ -11,8 +11,12 @@ class LoadData:
     def load_data(self, data_path):
         transform = transforms.Compose([
             transforms.Resize((self.image_H, self.image_W)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomCrop(size=(self.image_H, self.image_W), padding=4),
+
+            transforms.RandomHorizontalFlip(),  # randomly flip the image horizontally
+            transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),  # randomly adjust color
+            transforms.RandomCrop((self.image_H - 20, self.image_W - 20)),  # randomly crop the image
+            transforms.RandomResizedCrop((self.image_H, self.image_W), scale=(0.8, 1.0)),            
+            transforms.RandomRotation(10),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalize pixel values
         ])
