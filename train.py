@@ -10,5 +10,5 @@ args = parser.parse_args()
 config = get_config(args.config_file)
 
 task=Classify_task(config)
-task.training()
-task.evaluate()
+task.training() #traning, khi nào muốn predict thì cmt lại
+task.evaluate() #đánh giá trên test data

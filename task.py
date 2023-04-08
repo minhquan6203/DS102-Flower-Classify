@@ -16,6 +16,7 @@ class Classify_task:
       self.image_H=config.image_H
       self.train_path=config.train_path
       self.valid_path=config.valid_path
+      self.test_path=config.test_path
       self.batch_size=config.batch_size
       self.learning_rate=config.learning_rate
       self.num_classes=config.num_classes
@@ -128,10 +129,11 @@ class Classify_task:
         if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'), map_location=self.device)
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
-
+        else:
+            print('chưa train model mà đòi test')
         self.base_model.eval()
         total_correct = 0
-        
+
         with torch.no_grad():
             for images, labels in test_loader:
                 images, labels = images.to(self.device), labels.to(self.device)

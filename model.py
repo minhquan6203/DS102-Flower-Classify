@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 
-class CNN_Model(nn.Module):
+class CNN_Model(nn.Module): #this repo use ResNet34
 
     def __init__(self, config):
         super(CNN_Model, self).__init__()
