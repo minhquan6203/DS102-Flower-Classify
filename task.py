@@ -5,7 +5,7 @@ import os
 
 from model import CNN_Model
 from loaddata import LoadData
-
+from sklearn.metrics import f1_score, confusion_matrix
 
 
 class Classify_task:
@@ -122,8 +122,6 @@ class Classify_task:
                 print(f"Early stopping after epoch {epoch + 1}")
                 break
 
-        
-
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
@@ -134,11 +132,23 @@ class Classify_task:
         self.base_model.eval()
 
         test_acc = 0
+        true_labels = []
+        pred_labels = []
         with torch.no_grad():
             for images, labels in test_data:
                 images, labels = images.to(self.device), labels.to(self.device)
                 output = self.base_model(images)
 
                 test_acc += (output.argmax(1) == labels).sum().item() / labels.size(0)
+                true_labels.extend(labels.cpu().numpy())
+                pred_labels.extend(output.argmax(1).cpu().numpy())
         test_acc /= len(test_data)
         print('Test Accuracy: {:.4f}'.format(test_acc))
+        
+        f1 = f1_score(true_labels, pred_labels, average='macro')
+        print('F1 Score: {:.4f}'.format(f1))
+        
+        cm = confusion_matrix(true_labels, pred_labels)
+        print('Confusion Matrix:')
+        print(cm)
+
