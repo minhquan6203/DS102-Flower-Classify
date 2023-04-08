@@ -18,7 +18,7 @@ class LoadData:
             transforms.RandomResizedCrop((self.image_H, self.image_W), scale=(0.8, 1.0)),            
             transforms.RandomRotation(10),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalize pixel values
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ])
 
         dataset = torchvision.datasets.ImageFolder(
@@ -39,7 +39,7 @@ class LoadData:
         transform = transforms.Compose([
             transforms.Resize((self.image_H, self.image_W)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalize pixel values
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]) 
         ])
 
         dataset = torchvision.datasets.ImageFolder(
