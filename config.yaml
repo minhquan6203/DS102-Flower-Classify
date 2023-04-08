@@ -1,5 +1,5 @@
-train_path: /content/content/Train
-valid_path: /content/content/Valid
+train_path: /content/Creatures/Train
+valid_path: /content/Creatures/Valid
 save_path: /content/save/
 type_model: "LeNet5"
 image_C: 3
@@ -8,4 +8,4 @@ image_H: 224
 num_classes: 15
 batch_size: 128
 learning_rate: 0.001
-num_epochs: 10
+num_epochs: 100

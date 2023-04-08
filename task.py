@@ -96,7 +96,12 @@ class Classify_task:
                 'valid_loss':valid_loss}, os.path.join(self.save_path, 'last_model.pth'))
 
             # save the best model
-            best_valid_acc = 0.0
+            if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
+                checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
+                best_valid_acc=checkpoint['valid_acc']
+            else:
+                best_valid_acc = 0.0
+
             if epoch > 0 and valid_acc < best_valid_acc:
               threshold+=1
             else:
