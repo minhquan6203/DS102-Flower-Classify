@@ -55,6 +55,12 @@ class Classify_task:
             train_acc=0.
             train_loss=0.
             valid_loss=0.
+          
+        if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
+            checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
+            best_valid_acc=checkpoint['valid_acc']
+        else:
+            best_valid_acc = 0.0
             
         threshold=0
         for epoch in range(initial_epoch, self.num_epochs + initial_epoch):
@@ -96,27 +102,21 @@ class Classify_task:
                 'valid_loss':valid_loss}, os.path.join(self.save_path, 'last_model.pth'))
 
             # save the best model
-            if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
-                checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
-                best_valid_acc=checkpoint['valid_acc']
-            else:
-                best_valid_acc = 0.0
 
             if epoch > 0 and valid_acc < best_valid_acc:
               threshold+=1
             else:
               threshold=0
-            
             if valid_acc > best_valid_acc:
                 best_valid_acc = valid_acc
                 torch.save({
-                'epoch': epoch,
-                'model_state_dict': self.base_model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'valid_loss': valid_loss,
-                'train_acc':train_acc,
-                'train_loss':train_loss,
-                'valid_loss':valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
+                    'epoch': epoch,
+                    'model_state_dict': self.base_model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'valid_acc': valid_acc,
+                    'train_acc':train_acc,
+                    'train_loss':train_loss,
+                    'valid_loss':valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
                 print(f"Saved the best model with validation accuracy of {valid_acc:.4f}")
             
             # early stopping
