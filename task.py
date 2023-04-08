@@ -86,8 +86,8 @@ class Classify_task:
             valid_acc /= len(valid)
 
             print(f"epoch {epoch + 1}/{self.num_epochs + initial_epoch}")
-            print(f"train Loss: {train_loss:.4f} train Acc: {train_acc:.4f}")
-            print(f"valid Loss: {valid_loss:.4f} valid Acc: {valid_acc:.4f}")
+            print(f"train loss: {train_loss:.4f} train acc: {train_acc:.4f}")
+            print(f"valid loss: {valid_loss:.4f} valid acc: {valid_acc:.4f}")
 
             # save the model state dict
             torch.save({
@@ -143,10 +143,10 @@ class Classify_task:
                 true_labels.extend(labels.cpu().numpy())
                 pred_labels.extend(output.argmax(1).cpu().numpy())
         test_acc /= len(test_data)
-        print('test Accuracy: {:.4f}'.format(test_acc))
+        print('test accuracy: {:.4f}'.format(test_acc))
         
         f1 = f1_score(true_labels, pred_labels, average='macro')
-        print('F1 score: {:.4f}'.format(f1))
+        print('test F1 score: {:.4f}'.format(f1))
         
         cm = confusion_matrix(true_labels, pred_labels)
         print('confusion matrix:')
