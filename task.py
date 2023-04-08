@@ -43,7 +43,7 @@ class Classify_task:
             train_acc=checkpoint['train_acc']
             train_loss=checkpoint['train_loss']
             valid_loss=checkpoint['valid_loss']
-            print('Loaded the last saved model.')
+            print('loaded the last saved model!!!')
             initial_epoch = checkpoint['epoch'] + 1
             print(f"continue training from epoch {initial_epoch}")
         else:
@@ -85,9 +85,9 @@ class Classify_task:
             valid_loss /= len(valid)
             valid_acc /= len(valid)
 
-            print(f"Epoch {epoch + 1}/{self.num_epochs + initial_epoch}")
-            print(f"Train Loss: {train_loss:.4f} Train Acc: {train_acc:.4f}")
-            print(f"Valid Loss: {valid_loss:.4f} Valid Acc: {valid_acc:.4f}")
+            print(f"epoch {epoch + 1}/{self.num_epochs + initial_epoch}")
+            print(f"train Loss: {train_loss:.4f} train Acc: {train_acc:.4f}")
+            print(f"valid Loss: {valid_loss:.4f} valid Acc: {valid_acc:.4f}")
 
             # save the model state dict
             torch.save({
@@ -115,11 +115,11 @@ class Classify_task:
                     'train_acc':train_acc,
                     'train_loss':train_loss,
                     'valid_loss':valid_loss}, os.path.join(self.save_path, 'best_model.pth'))
-                print(f"Saved the best model with validation accuracy of {valid_acc:.4f}")
+                print(f"saved the best model with validation accuracy of {valid_acc:.4f}")
             
             # early stopping
             if threshold>=5:
-                print(f"Early stopping after epoch {epoch + 1}")
+                print(f"early stopping after epoch {epoch + 1}")
                 break
 
     def evaluate(self):
@@ -143,12 +143,12 @@ class Classify_task:
                 true_labels.extend(labels.cpu().numpy())
                 pred_labels.extend(output.argmax(1).cpu().numpy())
         test_acc /= len(test_data)
-        print('Test Accuracy: {:.4f}'.format(test_acc))
+        print('test Accuracy: {:.4f}'.format(test_acc))
         
         f1 = f1_score(true_labels, pred_labels, average='macro')
-        print('F1 Score: {:.4f}'.format(f1))
+        print('F1 score: {:.4f}'.format(f1))
         
         cm = confusion_matrix(true_labels, pred_labels)
-        print('Confusion Matrix:')
+        print('confusion matrix:')
         print(cm)
 
