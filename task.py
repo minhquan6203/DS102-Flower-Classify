@@ -1,16 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
-from torchvision.transforms import transforms
-import argparse
+import os
 
 from model import CNN_Model
 from loaddata import LoadData
 
 
-import os
-import argparse
+
 class Classify_task:
     def __init__(self, config):
       self.num_epochs=config.num_epochs
@@ -23,7 +20,7 @@ class Classify_task:
       self.learning_rate=config.learning_rate
       self.num_classes=config.num_classes
       self.save_path=config.save_path
-      self.load_data=LoadData(config)
+      self.dataloader=LoadData(config)
       self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
       self.base_model = CNN_Model(config).to(self.device)
   
@@ -31,8 +28,8 @@ class Classify_task:
         if not os.path.exists(self.save_path):
           os.makedirs(self.save_path)
 
-        train = self.load_data(data_path=self.train_path)
-        valid = self.load_data(data_path=self.valid_path)
+        train = self.dataloader.load_data(data_path=self.train_path)
+        valid = self.dataloader.load_data(data_path=self.valid_path)
 
         
         loss_function = nn.CrossEntropyLoss()
@@ -124,5 +121,25 @@ class Classify_task:
                 print(f"Early stopping after epoch {epoch + 1}")
                 break
 
-            
-    
+        
+
+    def evaluate(self):
+        test_loader = self.dataloader.load_test_data(data_path=self.test_path)
+        if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
+            checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'), map_location=self.device)
+            self.base_model.load_state_dict(checkpoint['model_state_dict'])
+
+        self.base_model.eval()
+        total_correct = 0
+        
+        with torch.no_grad():
+            for images, labels in test_loader:
+                images, labels = images.to(self.device), labels.to(self.device)
+
+                outputs = self.base_model(images)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total_correct += (predicted == labels).sum().item()
+
+        accuracy = 100.0 * total_correct / len(test_loader.dataset)
+        print('Test Accuracy: {:.2f}%'.format(accuracy))

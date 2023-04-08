@@ -11,3 +11,4 @@ config = get_config(args.config_file)
 
 task=Classify_task(config)
 task.training()
+task.evaluate()

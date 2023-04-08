@@ -1,5 +1,6 @@
 train_path: /content/Creatures/Train
 valid_path: /content/Creatures/Valid
+test_path: /content/Creatures/Valid
 save_path: /content/save/
 type_model: "LeNet5"
 image_C: 3

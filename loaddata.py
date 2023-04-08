@@ -31,6 +31,23 @@ class LoadData:
 
         return dataloader
         
-    def __call__(self, data_path):
-        load_data = self.load_data(data_path)
-        return load_data
+    def load_test_data(self, data_path):
+        transform = transforms.Compose([
+            transforms.Resize((self.image_H, self.image_W)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalize pixel values
+        ])
+
+        dataset = torchvision.datasets.ImageFolder(
+            root=data_path,
+            transform=transform
+        )
+
+        test_dataloader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=2
+        )
+
+        return test_dataloader
