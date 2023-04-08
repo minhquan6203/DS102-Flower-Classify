@@ -125,23 +125,20 @@ class Classify_task:
         
 
     def evaluate(self):
-        test_loader = self.dataloader.load_test_data(data_path=self.test_path)
+        test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'), map_location=self.device)
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
         else:
             print('chưa train model mà đòi test')
         self.base_model.eval()
-        total_correct = 0
 
+        test_acc = 0
         with torch.no_grad():
-            for images, labels in test_loader:
+            for images, labels in test_data:
                 images, labels = images.to(self.device), labels.to(self.device)
+                output = self.base_model(images)
 
-                outputs = self.base_model(images)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total_correct += (predicted == labels).sum().item()
-
-        accuracy = 100.0 * total_correct / len(test_loader.dataset)
-        print('Test Accuracy: {:.2f}%'.format(accuracy))
+                test_acc += (output.argmax(1) == labels).sum().item() / labels.size(0)
+        test_acc /= len(test_data)
+        print('Test Accuracy: {:.4f}'.format(test_acc))
