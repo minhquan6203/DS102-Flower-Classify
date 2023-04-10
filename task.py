@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from model import CNN_Model,SVM_Model
+from model import CNN_Model,SVM_Model,KMeans_Model
 from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix
 
@@ -28,6 +28,8 @@ class Classify_task:
             self.base_model = SVM_Model(config).to(self.device)
         if self.type_model=='CNN':
             self.base_model = CNN_Model(config).to(self.device)
+        if self.type_model=='Kmeans':
+            self.base_model = KMeans_Model(config).to(self.device)
   
     def training(self):
         if not os.path.exists(self.save_path):
@@ -80,6 +82,7 @@ class Classify_task:
                 for images, labels in valid:
                     images, labels = images.to(self.device), labels.to(self.device)
                     output = self.base_model(images)
+
                     loss = loss_function(output, labels)
                     valid_loss += loss.item()
                     valid_acc += (output.argmax(1) == labels).sum().item() / labels.size(0)
