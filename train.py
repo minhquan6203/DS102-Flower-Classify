@@ -1,7 +1,6 @@
 import argparse
 from get_config import get_config
 from task import Classify_task
-from svm_task import SVM_Classify_task
 parser = argparse.ArgumentParser()
 parser.add_argument("--config-file", type=str, required=True)
 

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from model import CNN_Model,SVM_Model,KMeans_Model
+from model import CNN_Model,SVM_Model,Kmeans_Model
 from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix
 
@@ -29,7 +29,7 @@ class Classify_task:
         if self.type_model=='CNN':
             self.base_model = CNN_Model(config).to(self.device)
         if self.type_model=='Kmeans':
-            self.base_model = KMeans_Model(config).to(self.device)
+            self.base_model = Kmeans_Model(config).to(self.device)
   
     def training(self):
         if not os.path.exists(self.save_path):
