@@ -24,7 +24,7 @@ class Classify_task:
         self.save_path=config.save_path
         self.dataloader=LoadData(config)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        if self.type_model=="SMV":
+        if self.type_model=="SVM":
             self.base_model = SVM_Model(config).to(self.device)
         if self.type_model=='CNN':
             self.base_model = CNN_Model(config).to(self.device)

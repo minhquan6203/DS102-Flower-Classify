@@ -21,8 +21,7 @@ class CNN_Model(nn.Module): #this repo use ResNet34
 class SVM_Model(nn.Module):
     def __init__(self, config):
         super(SVM_Model, self).__init__()
-        self.num_classes = config.num_classes
-        self.linear = nn.Linear(config.image_H * config.image_W * 3, self.num_classes)
+        self.linear = nn.Linear(config.image_H * config.image_W * config.image_C, config.num_classes)
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
