@@ -8,7 +8,7 @@ from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix
 
 
-class Classify_task:
+class CNN_Classify_task:
     def __init__(self, config):
       self.num_epochs=config.num_epochs
       self.image_C=config.image_C

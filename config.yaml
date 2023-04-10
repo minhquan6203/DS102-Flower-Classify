@@ -2,7 +2,7 @@ train_path: /content/Creatures/Train
 valid_path: /content/Creatures/Valid
 test_path: /content/Creatures/Valid
 save_path: /content/save/
-type_model: "this config for restnet 34"
+type_model: "SVM"
 image_C: 3
 image_W: 224
 image_H: 224
