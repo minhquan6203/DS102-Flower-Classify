@@ -3,27 +3,31 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from model import CNN_Model
+from model import CNN_Model,SVM_Model
 from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix
 
 
-class CNN_Classify_task:
+class Classify_task:
     def __init__(self, config):
-      self.num_epochs=config.num_epochs
-      self.image_C=config.image_C
-      self.image_W=config.image_W
-      self.image_H=config.image_H
-      self.train_path=config.train_path
-      self.valid_path=config.valid_path
-      self.test_path=config.test_path
-      self.batch_size=config.batch_size
-      self.learning_rate=config.learning_rate
-      self.num_classes=config.num_classes
-      self.save_path=config.save_path
-      self.dataloader=LoadData(config)
-      self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-      self.base_model = CNN_Model(config).to(self.device)
+        self.num_epochs=config.num_epochs
+        self.type_model=config.type_model
+        self.image_C=config.image_C
+        self.image_W=config.image_W
+        self.image_H=config.image_H
+        self.train_path=config.train_path
+        self.valid_path=config.valid_path
+        self.test_path=config.test_path
+        self.batch_size=config.batch_size
+        self.learning_rate=config.learning_rate
+        self.num_classes=config.num_classes
+        self.save_path=config.save_path
+        self.dataloader=LoadData(config)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if self.type_model=="SMV":
+            self.base_model = SVM_Model(config).to(self.device)
+        if self.type_model=='CNN':
+            self.base_model = CNN_Model(config).to(self.device)
   
     def training(self):
         if not os.path.exists(self.save_path):

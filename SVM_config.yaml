@@ -4,8 +4,8 @@ test_path: /content/Creatures/Valid
 save_path: /content/save/
 type_model: "SVM"
 image_C: 3
-image_W: 224
-image_H: 224
+image_W: 32
+image_H: 32
 num_classes: 15
 batch_size: 128
 learning_rate: 0.001
