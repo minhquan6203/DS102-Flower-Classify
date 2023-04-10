@@ -54,7 +54,7 @@ class SVM_Classify_task:
             test_pred.extend(self.model.predict(test_data.reshape(len(test_data), -1)))
             test_true.extend(test_labels)
 
-            test_acc = (self.model.predict(test_data.reshape(len(test_data), -1)) == test_labels).mean()
+            test_acc = accuracy_score(test_labels, self.model.predict(test_data.reshape(len(test_data), -1)))
             test_score.append(test_acc)
 
             # F1 score
@@ -67,4 +67,5 @@ class SVM_Classify_task:
         # Compute confusion matrix
         cm = confusion_matrix(test_true, test_pred)
         print(f"Confusion matrix:\n{cm}")
+
 
