@@ -20,17 +20,17 @@ class CNN_Model(nn.Module): #this repo use ResNet34
 
 
 
-class SVM_Model(nn.Module):
 
+class SVM_Model:
     def __init__(self, config):
-        super(SVM_Model, self).__init__()
         self.num_classes = config.num_classes
         self.svm = SVC(kernel='linear', C=1.0)
 
-    def forward(self, x):
-        x = x.view(x.size(0), -1)  # flatten the input tensor
-        x = self.svm(x)
-        return x
+    def fit(self, X, y):
+        self.svm.fit(X, y)
+
+    def predict(self, X):
+        return self.svm.predict(X)
 
 
 

@@ -9,12 +9,12 @@ parser.add_argument("--config-file", type=str, required=True)
 args = parser.parse_args()
 
 config = get_config(args.config_file)
-type=get_config(args.type_model)
-if type=="CNN":
+
+if config.type_model=="CNN":
     task=CNN_Classify_task(config)
     task.training() #traning, khi nào muốn predict thì cmt lại
     task.evaluate() #đánh giá trên test data
-if type=="SVM":
+if config.type_model=="SVM":
     task=SVM_Classify_task(config)
     task.training() #traning, khi nào muốn predict thì cmt lại
     task.evaluate() #đánh giá trên test data
