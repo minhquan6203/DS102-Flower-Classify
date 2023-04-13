@@ -15,6 +15,7 @@ class Classify_task:
         self.image_C=config.image_C
         self.image_W=config.image_W
         self.image_H=config.image_H
+        self.patience=config.patience
         self.train_path=config.train_path
         self.valid_path=config.valid_path
         self.test_path=config.test_path
@@ -125,7 +126,7 @@ class Classify_task:
                 print(f"saved the best model with validation accuracy of {valid_acc:.4f}")
             
             # early stopping
-            if threshold>=5:
+            if threshold>=self.patience:
                 print(f"early stopping after epoch {epoch + 1}")
                 break
 

@@ -3,6 +3,7 @@ valid_path: /content/Creatures/Valid
 test_path: /content/Creatures/Valid
 save_path: /content/save/
 type_model: "CNN"
+patience: 5
 image_C: 3
 image_W: 224
 image_H: 224
