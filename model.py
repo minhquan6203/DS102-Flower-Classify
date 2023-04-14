@@ -26,17 +26,3 @@ class SVM_Model(nn.Module):
     def forward(self, x):
         x = x.view(x.size(0), -1)
         return self.linear(x)
-
-
-
-class Kmeans_Model(nn.Module):
-
-    def __init__(self, config):
-        super(Kmeans_Model, self).__init__()
-        self.num_classes = config.num_classes
-        self.kmeans = KMeans(n_clusters=self.num_classes)
-
-    def forward(self, x):
-        x = x.view(x.size(0), -1)  # flatten the input tensor
-        x = self.kmeans.fit_predict(x)
-        return x
