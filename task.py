@@ -12,16 +12,11 @@ class Classify_task:
     def __init__(self, config):
         self.num_epochs=config.num_epochs
         self.type_model=config.type_model
-        self.image_C=config.image_C
-        self.image_W=config.image_W
-        self.image_H=config.image_H
         self.patience=config.patience
         self.train_path=config.train_path
         self.valid_path=config.valid_path
         self.test_path=config.test_path
-        self.batch_size=config.batch_size
         self.learning_rate=config.learning_rate
-        self.num_classes=config.num_classes
         self.save_path=config.save_path
         self.dataloader=LoadData(config)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -111,6 +106,7 @@ class Classify_task:
               threshold+=1
             else:
               threshold=0
+              
             if valid_acc > best_valid_acc:
                 best_valid_acc = valid_acc
                 torch.save({
