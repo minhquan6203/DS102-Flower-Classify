@@ -58,7 +58,7 @@ class Classify_task:
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
             best_valid_acc=checkpoint['valid_acc']
         else:
-            best_valid_acc = 0.0
+            best_valid_acc = 0.
             
         threshold=0
         for epoch in range(initial_epoch, self.num_epochs + initial_epoch):
@@ -90,7 +90,7 @@ class Classify_task:
             print(f"train loss: {train_loss:.4f} train acc: {train_acc:.4f}")
             print(f"valid loss: {valid_loss:.4f} valid acc: {valid_acc:.4f}")
 
-            # save the model state dict
+            # save the last model
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': self.base_model.state_dict(),
@@ -106,7 +106,7 @@ class Classify_task:
               threshold+=1
             else:
               threshold=0
-              
+
             if valid_acc > best_valid_acc:
                 best_valid_acc = valid_acc
                 torch.save({
@@ -133,7 +133,7 @@ class Classify_task:
             print('chưa train model mà đòi test')
         self.base_model.eval()
 
-        test_acc = 0
+        test_acc = 0.
         true_labels = []
         pred_labels = []
         with torch.no_grad():
