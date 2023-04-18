@@ -5,7 +5,7 @@ import torchvision.models as models
 from sklearn.svm import SVC
 from sklearn.cluster import KMeans
 
-class CNN_Model(nn.Module): #this repo use ResNet34
+class CNN_Model(nn.Module): #use ResNet34
 
     def __init__(self, config):
         super(CNN_Model, self).__init__()
