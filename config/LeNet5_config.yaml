@@ -1,9 +1,9 @@
-train_path: /content/Creatures/Train
-valid_path: /content/Creatures/Valid
-test_path: /content/Creatures/Valid
+train_path: /content/ML-basic/mnist/train
+valid_path: /content/ML-basic/mnist/val
+test_path: /content/ML-basic/mnist/val
 save_path: /content/save/
-type_model: "LetNet5"
-patience: 5
+type_model: "LeNet5"
+patience: 10
 image_C: 3
 image_W: 28
 image_H: 28
