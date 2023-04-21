@@ -49,10 +49,7 @@ class Classify_task:
             train_loss=0.
             valid_loss=0.
 
-        valid_acc=0.
-        train_acc=0.
-        train_loss=0.
-        valid_loss=0.
+
 
         if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
@@ -62,6 +59,10 @@ class Classify_task:
             
         threshold=0
         for epoch in range(initial_epoch, self.num_epochs + initial_epoch):
+            valid_acc=0.
+            train_acc=0.
+            train_loss=0.
+            valid_loss=0.
             for images, labels in train:
                 images, labels = images.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
