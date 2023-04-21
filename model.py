@@ -63,3 +63,29 @@ class LeNet5(nn.Module):
         x = self.fc3(x)
 
         return x
+
+
+class NN(nn.Module):
+    def __init__(self, config):
+        super(NN, self).__init__()
+        self.linear1 = nn.Linear(config.image_H * config.image_W * config.image_C, 512)
+        self.linear2 = nn.Linear(512,256)
+        self.linear3 = nn.Linear(256, config.num_classes)
+        self.drop = nn.Dropout(0.2)
+        self.acv = nn.ReLU()
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)
+        x=self.linear1(x)
+        x=self.acv(x)
+        x=self.drop(x)
+        
+        x=self.linear2(x)
+        x=self.acv(x)
+        x=self.drop(x)
+
+        x=self.linear3(x)
+        x = torch.softmax(x, dim=1)
+
+        return x
+    
