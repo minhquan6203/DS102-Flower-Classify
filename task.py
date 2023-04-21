@@ -40,21 +40,20 @@ class Classify_task:
             checkpoint = torch.load(os.path.join(self.save_path, 'last_model.pth'))
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            valid_acc = checkpoint['valid_acc']
-            train_acc=checkpoint['train_acc']
-            train_loss=checkpoint['train_loss']
-            valid_loss=checkpoint['valid_loss']
             print('loaded the last saved model!!!')
             initial_epoch = checkpoint['epoch'] + 1
             print(f"continue training from epoch {initial_epoch}")
         else:
             initial_epoch = 0
             print("first time training!!!")
-            valid_acc=0.
-            train_acc=0.
             train_loss=0.
             valid_loss=0.
-          
+
+        valid_acc=0.
+        train_acc=0.
+        train_loss=0.
+        valid_loss=0.
+
         if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'))
             best_valid_acc=checkpoint['valid_acc']
