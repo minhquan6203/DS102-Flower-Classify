@@ -3,11 +3,11 @@ valid_path: /content/ML-basic/mnist/val
 test_path: /content/ML-basic/mnist/val
 save_path: /content/save/
 type_model: "LeNet5"
-patience: 10
+patience: 5
 image_C: 3
 image_W: 28
 image_H: 28
 num_classes: 10
-batch_size: 128
+batch_size: 256
 learning_rate: 0.001
 num_epochs: 100
