@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from model import CNN_Model,SVM_Model
+from model import CNN_Model,SVM_Model,LeNet5
 from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix
 
@@ -24,7 +24,8 @@ class Classify_task:
             self.base_model = SVM_Model(config).to(self.device)
         if self.type_model=='CNN':
             self.base_model = CNN_Model(config).to(self.device)
-  
+        if self.type_model=="LeNet5":
+            self.base_model = LeNet5(config).to(self.device)
     def training(self):
         if not os.path.exists(self.save_path):
           os.makedirs(self.save_path)
