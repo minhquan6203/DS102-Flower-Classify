@@ -59,12 +59,12 @@ class Classify_task:
             best_valid_acc = 0.
             
         threshold=0
+        self.base_model.train()
         for epoch in range(initial_epoch, self.num_epochs + initial_epoch):
             valid_acc=0.
             train_acc=0.
             train_loss=0.
             valid_loss=0.
-            self.base_model.train()
             for images, labels in train:
                 images, labels = images.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
