@@ -1,12 +1,21 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
-
+from PIL import Image
 class LoadData:
     def __init__(self, config):
         self.image_H = config.image_H
         self.image_W = config.image_W
         self.batch_size = config.batch_size
+        
+    def __len__(self):
+            return len(self.data)
+
+    def __getitem__(self, idx):
+        img_path, label = self.data[idx]
+        img = Image.open(img_path).convert('RGB')
+        img = self.transform(img)
+        return img, label
 
     def load_data(self, data_path):
         transform = transforms.Compose([

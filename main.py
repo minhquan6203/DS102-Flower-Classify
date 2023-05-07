@@ -1,15 +1,17 @@
 import argparse
 from get_config import get_config
-from task import Classify_task
+from clasify_task import Classify_Task
+from clustering_task import Clustering_Task
 parser = argparse.ArgumentParser()
 parser.add_argument("--config-file", type=str, required=True)
-
 
 args = parser.parse_args()
 
 config = get_config(args.config_file)
 
-
-task=Classify_task(config)
+if config.task=='classify':
+    task=Classify_Task(config)
+if config.task=='clustering':
+    task=Classify_Task(config)
 task.training() #traning, khi nào muốn predict thì cmt lại
 task.evaluate() #đánh giá trên test data

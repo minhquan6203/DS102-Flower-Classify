@@ -2,8 +2,25 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-from sklearn.svm import SVC
+from transformers import ViTModel
 from sklearn.cluster import KMeans
+import numpy as np
+
+class ViT_Model(nn.Module):
+    def __init__(self, config):
+        super(ViT_Model, self).__init__()
+        self.vit = ViTModel.from_pretrained(config.model_name_or_path)
+        self.classifier = nn.Linear(self.vit.config.hidden_size, config.num_classes)
+       
+    def forward(self, x):
+        # x is an input image tensor of shape [batch_size, channels, height, width]
+        x = self.vit(x)
+        # only use the first output from ViT, which is the cls_token representation
+        x = x.last_hidden_state[:, 0]
+        logits = self.classifier(x)
+        logits = torch.softmax(logits, dim=1)
+        return logits
+
 
 class CNN_Model(nn.Module): #use ResNet34
 
@@ -26,7 +43,6 @@ class SVM_Model(nn.Module):
     def forward(self, x):
         x = x.view(x.size(0), -1)
         return self.linear(x)
-
 
 class LeNet5(nn.Module):
     def __init__(self,config):
@@ -64,7 +80,6 @@ class LeNet5(nn.Module):
 
         return x
 
-
 class NN(nn.Module):
     def __init__(self, config):
         super(NN, self).__init__()
@@ -89,3 +104,58 @@ class NN(nn.Module):
 
         return x
     
+
+
+class FeatureExtractor(nn.Module):
+    def __init__(self, config):
+        super(FeatureExtractor, self).__init__()
+        model_dict = {
+            'lenet5': models.lenet5(pretrained=True),
+            'vgg16': models.vgg16(pretrained=True),
+            'alexnet': models.alexnet(pretrained=True),
+            'resnet18': models.resnet18(pretrained=True)
+        }
+        assert config.model_extract_name in model_dict, f"Unsupported model: {config.model_extract_name}"
+        self.cnn = model_dict[config.model_extract_name]
+        
+        # Modify the code that removes the last layer of the CNN to be consistent with the structure of the selected CNN model
+        if config.model_extract_name in ['lenet5', 'alexnet']:
+            self.cnn = nn.Sequential(*list(self.cnn.children())[:-1])
+        else:
+            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
+
+    def forward(self, x):
+        features = self.cnn(x)
+        # Flatten the features
+        features = features.view(features.size(0), -1)
+        return features
+
+
+class KMeans_Model:
+    def __init__(self, config):
+        self.num_clusters = config.num_clusters
+        self.feature_extractor = FeatureExtractor(config)
+        self.kmeans = KMeans(n_clusters=config.num_clusters)
+    
+    def fit(self, dataloader):
+        # Extract features
+        features = []
+        for batch in dataloader:
+            images, _ = batch
+            features.append(self.feature_extractor(images).detach().cpu().numpy())
+        features = np.concatenate(features)
+        
+        # Fit KMeans model to the extracted features
+        self.kmeans.fit(features)
+        
+    def predict(self, dataloader):
+        # Extract features
+        features = []
+        for batch in dataloader:
+            images, _ = batch
+            features.append(self.feature_extractor(images).detach().cpu().numpy())
+        features = np.concatenate(features)
+        
+        clusters = self.kmeans.predict(features)
+        
+        return clusters

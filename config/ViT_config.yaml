@@ -2,7 +2,8 @@ train_path: ./content/Train
 valid_path: ./content/Valid
 test_path: ./content/Test
 save_path: /content/save/
-type_model: "CNN"
+type_model: "Transformer"
+model_name_or_path: google/vit-base-patch16-224-in21k
 patience: 5
 image_C: 3
 image_W: 224

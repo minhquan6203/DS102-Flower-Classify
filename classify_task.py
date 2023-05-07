@@ -3,15 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from model import CNN_Model,SVM_Model,LeNet5,NN
 from loaddata import LoadData
-from sklearn.metrics import f1_score, confusion_matrix
+from sklearn.metrics import f1_score, confusion_matrix, accuracy_score
+from build import build_model,build_loss_fn
 
-
-class Classify_task:
+class Classify_Task:
     def __init__(self, config):
         self.num_epochs=config.num_epochs
-        self.type_model=config.type_model
         self.patience=config.patience
         self.train_path=config.train_path
         self.valid_path=config.valid_path
@@ -20,14 +18,8 @@ class Classify_task:
         self.save_path=config.save_path
         self.dataloader=LoadData(config)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        if self.type_model=="SVM":
-            self.base_model = SVM_Model(config).to(self.device)
-        if self.type_model=='CNN':
-            self.base_model = CNN_Model(config).to(self.device)
-        if self.type_model=="LeNet5":
-            self.base_model = LeNet5(config).to(self.device)
-        if self.type_model=="NN":
-            self.base_model=NN(config).to(self.device)
+        self.base_model=build_model(config).to(self.device)
+        self.loss_function=build_loss_fn(config)
 
     def training(self):
         if not os.path.exists(self.save_path):
@@ -36,8 +28,6 @@ class Classify_task:
         train = self.dataloader.load_data(data_path=self.train_path)
         valid = self.dataloader.load_data(data_path=self.valid_path)
 
-        
-        loss_function = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.base_model.parameters(), lr=self.learning_rate)
         if os.path.exists(os.path.join(self.save_path, 'last_model.pth')):
             checkpoint = torch.load(os.path.join(self.save_path, 'last_model.pth'))
@@ -69,7 +59,7 @@ class Classify_task:
                 images, labels = images.to(self.device), labels.to(self.device)
                 optimizer.zero_grad()
                 output = self.base_model(images)
-                loss = loss_function(output, labels)
+                loss = self.loss_function(output, labels)
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
@@ -80,7 +70,7 @@ class Classify_task:
                     images, labels = images.to(self.device), labels.to(self.device)
                     output = self.base_model(images)
 
-                    loss = loss_function(output, labels)
+                    loss = self.loss_function(output, labels)
                     valid_loss += loss.item()
                     valid_acc += (output.argmax(1) == labels).sum().item() / labels.size(0)
 
@@ -133,7 +123,7 @@ class Classify_task:
             checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'), map_location=self.device)
             self.base_model.load_state_dict(checkpoint['model_state_dict'])
         else:
-            print('chưa train model mà đòi test')
+            print('chưa train model mà đòi test hả')
         self.base_model.eval()
 
         test_acc = 0.
