@@ -105,7 +105,6 @@ class NN(nn.Module):
         return x
     
 
-
 class FeatureExtractor(nn.Module):
     def __init__(self, config):
         super(FeatureExtractor, self).__init__()
@@ -115,7 +114,7 @@ class FeatureExtractor(nn.Module):
             'alexnet': models.alexnet(pretrained=True),
             'resnet18': models.resnet18(pretrained=True)
         }
-        assert config.model_extract_name in model_dict, f"Unsupported model: {config.model_extract_name}"
+        assert config.model_extract_name in model_dict, f"đéo hỗ trợ model này: {config.model_extract_name}"
         self.cnn = model_dict[config.model_extract_name]
         
         # Modify the code that removes the last layer of the CNN to be consistent with the structure of the selected CNN model
@@ -136,26 +135,35 @@ class KMeans_Model:
         self.num_clusters = config.num_clusters
         self.feature_extractor = FeatureExtractor(config)
         self.kmeans = KMeans(n_clusters=config.num_clusters)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+    def _to_numpy(self, tensor):
+        if self.device.type == 'cuda':
+            return tensor.detach().cpu().numpy()
+        else:
+            return tensor.detach().numpy()
     
     def fit(self, dataloader):
         # Extract features
         features = []
-        for batch in dataloader:
-            images, _ = batch
-            features.append(self.feature_extractor(images).detach().cpu().numpy())
+        for images, labels in dataloader:
+            images, labels = images.to(self.device), labels.to(self.device)
+            features.append(self._to_numpy(self.feature_extractor(images)))
         features = np.concatenate(features)
         
-        # Fit KMeans model to the extracted features
+        # Fit model 
         self.kmeans.fit(features)
         
     def predict(self, dataloader):
         # Extract features
         features = []
-        for batch in dataloader:
-            images, _ = batch
-            features.append(self.feature_extractor(images).detach().cpu().numpy())
+        for images, labels in dataloader:
+            images, labels = images.to(self.device), labels.to(self.device)
+            features.append(self._to_numpy(self.feature_extractor(images)))
+
         features = np.concatenate(features)
-        
         clusters = self.kmeans.predict(features)
-        
+
         return clusters
+
+

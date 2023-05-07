@@ -29,7 +29,7 @@ class Clustering_Task:
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
-            self.base_model = joblib.load()
+            self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
         else:
             print('chưa train model mà đòi test hả?')
         y_true, y_pred = [], []
