@@ -14,8 +14,7 @@ class Clustering_Task:
         self.test_path=config.test_path
         self.save_path=config.save_path
         self.dataloader=LoadData(config)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.base_model=build_model(config).to(self.device)
+        self.base_model=build_model(config)
 
     def training(self):
         if not os.path.exists(self.save_path):
@@ -34,7 +33,6 @@ class Clustering_Task:
             print('chưa train model mà đòi test hả?')
         y_true, y_pred = [], []
         for images, labels in test_data:
-            images, labels = images.to(self.device), labels.to(self.device)
             outputs = self.base_model.predict(images)
 
             _, preds = torch.max(outputs, 1)

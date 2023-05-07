@@ -133,9 +133,9 @@ class FeatureExtractor(nn.Module):
 class KMeans_Model:
     def __init__(self, config):
         self.num_clusters = config.num_clusters
-        self.feature_extractor = FeatureExtractor(config)
+        self.device = config.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.feature_extractor = FeatureExtractor(config).to(self.device)
         self.kmeans = KMeans(n_clusters=config.num_clusters)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
     def _to_numpy(self, tensor):
         if self.device.type == 'cuda':
