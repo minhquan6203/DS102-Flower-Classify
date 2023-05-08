@@ -4,7 +4,7 @@ test_path: ./content/Test
 save_path: /content/save/
 type_model: "SVM"
 model_extract_name: "vgg16"
-kernel_type: "rbf"
+kernel_type: "linear"
 gamma: 0.1
 degree: 2
 task: "classify"

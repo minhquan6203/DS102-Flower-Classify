@@ -12,6 +12,6 @@ config = get_config(args.config_file)
 if config.task=='classify':
     task=Classify_Task(config)
 if config.task=='clustering':
-    task=Classify_Task(config)
+    task=Clustering_Task(config)
 task.training() #traning, khi nào muốn predict thì cmt lại
 task.evaluate() #đánh giá trên test data

@@ -21,6 +21,7 @@ class Clustering_Task:
           os.makedirs(self.save_path)
 
         train = self.dataloader.load_data(data_path=self.train_path)
+        print('training!!!')
         self.base_model.fit(train)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
 

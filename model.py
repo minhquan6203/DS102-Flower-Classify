@@ -95,15 +95,10 @@ class NN(nn.Module):
 
         return x
     
-
-import torch
-import torch.nn as nn
-from sklearn.metrics.pairwise import rbf_kernel
-
 class FeatureExtractor(nn.Module):
     def __init__(self, config):
         super(FeatureExtractor, self).__init__()
-        
+        self.input_shape = (config.image_C,config.image_W, config.image_H)
         if config.model_extract_name == 'vgg16':
             self.cnn = models.vgg16(pretrained=True)
             self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
@@ -121,6 +116,13 @@ class FeatureExtractor(nn.Module):
         # Flatten the features
         features = features.view(features.size(0), -1)
         return features
+    
+    def output_size(self):
+        # Get the output size of the feature extractor
+        with torch.no_grad():
+            output = self.forward(torch.zeros(1, *self.input_shape))
+        return output.size(1)
+
 
 class SVM_Model(nn.Module):
     def __init__(self, config):
@@ -132,37 +134,61 @@ class SVM_Model(nn.Module):
         self.degree = config.degree
         
         if self.kernel_type == 'linear':
-            self.classifier = nn.Linear(self.feature_extractor.output_size, self.num_classes, bias=False)
+            self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes, bias=False)
         elif self.kernel_type == 'rbf':
-            self.classifier = nn.Linear(self.feature_extractor.output_size, self.num_classes, bias=False)
+            self.classifier = RBFSVM(self.feature_extractor.output_size(), self.num_classes, self.gamma)
         elif self.kernel_type == 'poly':
-            self.poly = nn.Linear(self.feature_extractor.output_size, self.degree, bias=False)
-            self.classifier = nn.Linear(self.degree, self.num_classes, bias=False)
+            self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.degree)
         else:
-            raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
-        
+            raise ValueError('Invalid kernel type')
+
     def forward(self, x):
-        features = self.feature_extractor(x)
-        
-        if self.kernel_type == 'linear':
-            output = self.classifier(features)
-        elif self.kernel_type == 'rbf':
-            kernel_matrix = rbf_kernel(features.cpu().numpy(), gamma=self.gamma)
-            kernel_tensor = torch.from_numpy(kernel_matrix).to(features.device)
-            output = self.classifier(kernel_tensor)
-        elif self.kernel_type == 'poly':
-            features = torch.pow(features, self.degree)
-            output = self.classifier(features)
-        else:
-            raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
-        
-        return output
+        x = self.feature_extractor(x)
+        out = self.classifier(x)
+        return out
+
+class RBFSVM(nn.Module):
+    def __init__(self, input_size, num_classes, gamma):
+        super(RBFSVM, self).__init__()
+        self.input_size = input_size
+        self.num_classes = num_classes
+        self.gamma = gamma
+        self.support_vectors = nn.Parameter(torch.randn(1, input_size))
+        self.coefficients = nn.Parameter(torch.randn(1, num_classes))
+
+    def forward(self, x):
+        # Compute kernel matrix
+        diff = x.unsqueeze(1) - self.support_vectors.unsqueeze(0)
+        norm = diff.norm(dim=-1)
+        K = torch.exp(-self.gamma * norm ** 2)
+        # Compute decision function
+        f = (K * self.coefficients).sum(dim=1)
+
+        return f
+
+class PolySVM(nn.Module):
+    def __init__(self, input_size, num_classes, gamma, degree):
+        super(PolySVM, self).__init__()
+        self.input_size = input_size
+        self.num_classes = num_classes
+        self.gamma = gamma
+        self.degree = degree
+        self.support_vectors = nn.Parameter(torch.randn(1, input_size))
+        self.coefficients = nn.Parameter(torch.randn(1, num_classes))
+
+    def forward(self, x):
+        # Compute kernel matrix
+        dot = (x.unsqueeze(1) * self.support_vectors.unsqueeze(0)).sum(dim=-1)
+        K = (self.gamma * dot + 1) ** self.degree
+        # Compute decision function
+        f = (K * self.coefficients).sum(dim=1)
+        return f
 
 
 class KMeans_Model:
     def __init__(self, config):
         self.num_clusters = config.num_clusters
-        self.device = config.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.feature_extractor = FeatureExtractor(config).to(self.device)
         self.kmeans = KMeans(n_clusters=config.num_clusters)
         

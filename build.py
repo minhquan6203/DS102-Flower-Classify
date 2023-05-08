@@ -13,7 +13,7 @@ def build_model(config):
         return NN(config)
     if config.type_model=="Transformer":
         return ViT_Model(config)
-    if config.config.type_model=="Kmeans":
+    if config.type_model=="Kmeans":
         return KMeans_Model(config)
    
 
