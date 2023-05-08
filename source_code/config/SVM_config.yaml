@@ -3,7 +3,7 @@ valid_path: ./content/Valid
 test_path: ./content/Test
 save_path: /content/save/
 type_model: "SVM"
-model_extract_name: "vgg16"
+model_extract_name: "resnet34"
 kernel_type: "rbf"
 gamma: 0.1
 degree: 2
