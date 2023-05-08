@@ -3,8 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 from transformers import ViTModel
-from sklearn.cluster import KMeans
 import numpy as np
+from sklearn.cluster import KMeans
+from extract_feature import FeatureExtractor
+
 
 class ViT_Model(nn.Module):
     def __init__(self, config):
@@ -13,9 +15,8 @@ class ViT_Model(nn.Module):
         self.classifier = nn.Linear(self.vit.config.hidden_size, config.num_classes)
        
     def forward(self, x):
-        # x is an input image tensor of shape [batch_size, channels, height, width]
+        # shape of x [batch_size, channels, height, width]
         x = self.vit(x)
-        # only use the first output from ViT, which is the cls_token representation
         x = x.last_hidden_state[:, 0]
         logits = self.classifier(x)
         logits = torch.softmax(logits, dim=1)
@@ -71,7 +72,7 @@ class LeNet5(nn.Module):
 
         return x
 
-class NN(nn.Module):
+class NN(nn.Module): #neural net
     def __init__(self, config):
         super(NN, self).__init__()
         self.linear1 = nn.Linear(config.image_H * config.image_W * config.image_C, 512)
@@ -95,34 +96,6 @@ class NN(nn.Module):
 
         return x
     
-class FeatureExtractor(nn.Module):
-    def __init__(self, config):
-        super(FeatureExtractor, self).__init__()
-        self.input_shape = (config.image_C,config.image_H, config.image_W)
-        if config.model_extract_name == 'vgg16':
-            self.cnn = models.vgg16(pretrained=True)
-            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
-        elif config.model_extract_name == 'alexnet':
-            self.cnn = models.alexnet(pretrained=True)
-            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
-        elif config.model_extract_name == 'resnet34':
-            self.cnn = models.resnet34(pretrained=True)
-            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
-        else:
-            print(f"đéo hỗ trợ model này: {config.model_extract_name}")
-
-    def forward(self, x):
-        features = self.cnn(x)
-        # Flatten the features
-        features = features.view(features.size(0), -1)
-        return features
-    
-    def output_size(self):
-        # Get the output size of the feature extractor
-        with torch.no_grad():
-            output = self.forward(torch.zeros(1, *self.input_shape))
-        return output.size(1)
-
 
 class SVM_Model(nn.Module):
     def __init__(self, config):
@@ -183,7 +156,6 @@ class PolySVM(nn.Module):
         # Compute decision function
         f = (K * self.coefficients).sum(dim=1)
         return f
-
 
 class KMeans_Model:
     def __init__(self, config):
