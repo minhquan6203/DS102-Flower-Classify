@@ -126,18 +126,15 @@ class RBFSVM(nn.Module):
         self.input_size = input_size
         self.num_classes = num_classes
         self.gamma = gamma
-        self.support_vectors = nn.Parameter(torch.randn(1, input_size))
-        self.coefficients = nn.Parameter(torch.randn(1, num_classes))
+        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
+        self.bias = nn.Parameter(torch.zeros(num_classes))
 
     def forward(self, x):
-        # Compute kernel matrix
-        diff = x.unsqueeze(1) - self.support_vectors.unsqueeze(0)
-        norm = diff.norm(dim=-1)
-        K = torch.exp(-self.gamma * norm ** 2)
-        # Compute decision function
-        f = (K * self.coefficients).sum(dim=1)
+        x = x.view(-1, self.input_size)
+        dists = torch.cdist(x, self.weights, p=2)
+        outputs = torch.exp(-self.gamma * dists ** 2) + self.bias
+        return outputs
 
-        return f
 
 class PolySVM(nn.Module):
     def __init__(self, input_size, num_classes, gamma, degree):
@@ -146,16 +143,16 @@ class PolySVM(nn.Module):
         self.num_classes = num_classes
         self.gamma = gamma
         self.degree = degree
-        self.support_vectors = nn.Parameter(torch.randn(1, input_size))
-        self.coefficients = nn.Parameter(torch.randn(1, num_classes))
+        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
+        self.bias = nn.Parameter(torch.zeros(num_classes))
 
     def forward(self, x):
-        # Compute kernel matrix
-        dot = (x.unsqueeze(1) * self.support_vectors.unsqueeze(0)).sum(dim=-1)
-        K = (self.gamma * dot + 1) ** self.degree
-        # Compute decision function
-        f = (K * self.coefficients).sum(dim=1)
-        return f
+        x = x.view(-1, self.input_size)
+        dists = torch.cdist(x, self.weights, p=2)
+        kernel_matrix = (self.gamma * dists + 1) ** self.degree
+        outputs = kernel_matrix + self.bias
+        return outputs
+
 
 class KMeans_Model:
     def __init__(self, config):

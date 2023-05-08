@@ -21,15 +21,16 @@ class Clustering_Task:
           os.makedirs(self.save_path)
 
         train = self.dataloader.load_data(data_path=self.train_path)
-        print('training!!!')
+        print('training, please waiting!!!')
         self.base_model.fit(train)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
-
+        print("finished training!!!")
 
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
             self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
+            print("evaluate mode after trainingl!!!")
         else:
             print('chưa train model mà đòi test hả?')
         y_true, y_pred = [], []
