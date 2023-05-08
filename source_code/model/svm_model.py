@@ -6,25 +6,31 @@ from utils.extract_feature import FeatureExtractor
 class SVM_Model(nn.Module):
     def __init__(self, config):
         super(SVM_Model, self).__init__()
-
+        self.num_classes = config.num_classes
+        self.image_W = config.image_W
+        self.image_H = config.image_H
+        self.image_C = config.image_C
+        self.gamma = config.gamma
+        self.degree = config.degree
+        
         if config.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config)
             if config.kernel_type == 'linear':
-                self.classifier = nn.Linear(self.feature_extractor.output_size(), config.num_classes)
+                self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
             elif config.kernel_type == 'rbf':
-                self.classifier = RBFSVM(self.feature_extractor.output_size(), config.num_classes, config.gamma)
+                self.classifier = RBFSVM(self.feature_extractor.output_size(), self.num_classes, self.gamma)
             elif config.kernel_type == 'poly':
-                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, config.gamma, config.degree)
+                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
         else:
             self.feature_extractor = None
             if config.kernel_type == 'linear':
-                self.classifier = nn.Linear(config.image_H*config.image_W*config.image_C, self.num_classes)
+                self.classifier = nn.Linear(self.image_H*self.image_W*self.image_C, self.num_classes)
             elif config.kernel_type == 'rbf':
-                self.classifier = RBFSVM(config.image_H*config.image_W*config.image_C, self.num_classes, config.gamma)
+                self.classifier = RBFSVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma)
             elif config.kernel_type == 'poly':
-                self.classifier = PolySVM(config.image_H*config.image_W*config.image_C, self.num_classes, config.gamma, config.degree)
+                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
 

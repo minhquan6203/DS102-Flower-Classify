@@ -5,10 +5,10 @@ import torchvision.models as models
 from transformers import ViTModel
 
 class ResNet34_Model(nn.Module): #use ResNet34
-
     def __init__(self, config):
         super(ResNet34_Model, self).__init__()
         self.num_classes = config.num_classes
+        
         self.resnet = models.resnet34(pretrained=True)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, self.num_classes)
 
@@ -20,15 +20,17 @@ class ResNet34_Model(nn.Module): #use ResNet34
 class LeNet5(nn.Module):
     def __init__(self,config):
         super(LeNet5, self).__init__()
+        self.image_C = config.image_C
+        self.num_classes = config.num_classes
 
         #các lớp convolution
-        self.conv1 = nn.Conv2d(config.image_C, 6, 5, padding=2)
+        self.conv1 = nn.Conv2d(self.image_C, 6, 5, padding=2)
         self.conv2 = nn.Conv2d(6, 16, 5)
 
         #các lớp linear
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, config.num_classes)
+        self.fc3 = nn.Linear(84, self.num_classes)
 
     def forward(self, x):
         # lớp convolution thứ nhất
@@ -55,8 +57,12 @@ class LeNet5(nn.Module):
 
 class NN(nn.Module): #neural net
     def __init__(self, config):
+        self.image_W = config.image_W
+        self.image_H = config.image_H
+        self.image_C = config.image_C
+
         super(NN, self).__init__()
-        self.linear1 = nn.Linear(config.image_H * config.image_W * config.image_C, 512)
+        self.linear1 = nn.Linear(self.image_H*self.image_W*self.image_C, 512)
         self.linear2 = nn.Linear(512,256)
         self.linear3 = nn.Linear(256, config.num_classes)
         self.drop = nn.Dropout(0.2)

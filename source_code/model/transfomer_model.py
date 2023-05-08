@@ -7,8 +7,10 @@ from transformers import ViTModel
 class ViT_Model(nn.Module):
     def __init__(self, config):
         super(ViT_Model, self).__init__()
-        self.vit = ViTModel.from_pretrained(config.model_name_or_path)
-        self.classifier = nn.Linear(self.vit.config.hidden_size, config.num_classes)
+        self.model_name_or_path = config.model_name_or_path
+        self.num_classes = config.num_classes
+        self.vit = ViTModel.from_pretrained(self.model_name_or_path)
+        self.classifier = nn.Linear(self.vit.config.hidden_size, self.num_classes)
        
     def forward(self, x):
         # shape of x [batch_size, channels, height, width]

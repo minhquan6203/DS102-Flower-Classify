@@ -9,13 +9,15 @@ from utils.extract_feature import FeatureExtractor
 
 class KMeans_Model:
     def __init__(self, config):
+        self.num_clusters = config.num_clusters
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
         if config.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config).to(self.device)
         else:
             self.feature_extractor = None
 
-        self.kmeans = KMeans(n_clusters=config.num_clusters)
+        self.kmeans = KMeans(n_clusters=self.num_clusters)
         
     def _to_numpy(self, tensor):
         if self.device.type == 'cuda':
