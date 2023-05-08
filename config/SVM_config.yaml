@@ -3,6 +3,11 @@ valid_path: ./content/Valid
 test_path: ./content/Test
 save_path: /content/save/
 type_model: "SVM"
+model_extract_name: "vgg16"
+kernel_type: "rbf"
+gamma: 0.1
+degree: 2
+task: "classify"
 patience: 5
 image_C: 3
 image_W: 224

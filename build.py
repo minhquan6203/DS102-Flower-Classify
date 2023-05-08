@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-from model import CNN_Model,SVM_Model,LeNet5,NN,ViT_Model,KMeans_Model
+from model import ResNet34_Model,SVM_Model,LeNet5,NN,ViT_Model,KMeans_Model
 
 def build_model(config):
     if config.type_model=="SVM":
         return SVM_Model(config)
-    if config.type_model=='CNN':
-        return CNN_Model(config)
+    if config.type_model=='ResNet':
+        return ResNet34_Model(config)
     if config.type_model=="LeNet5":
         return LeNet5(config)
     if config.type_model=="NN":

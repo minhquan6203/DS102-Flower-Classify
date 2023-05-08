@@ -1,4 +1,4 @@
-from model import KMeansModel
+from model import KMeans_Model
 from loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix,accuracy_score
 from build import build_model

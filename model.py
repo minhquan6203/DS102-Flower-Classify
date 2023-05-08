@@ -22,10 +22,10 @@ class ViT_Model(nn.Module):
         return logits
 
 
-class CNN_Model(nn.Module): #use ResNet34
+class ResNet34_Model(nn.Module): #use ResNet34
 
     def __init__(self, config):
-        super(CNN_Model, self).__init__()
+        super(ResNet34_Model, self).__init__()
         self.num_classes = config.num_classes
         self.resnet = models.resnet34(pretrained=True)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, self.num_classes)
@@ -34,15 +34,6 @@ class CNN_Model(nn.Module): #use ResNet34
         x = self.resnet(x)
         x = torch.softmax(x, dim=1)
         return x
-
-class SVM_Model(nn.Module):
-    def __init__(self, config):
-        super(SVM_Model, self).__init__()
-        self.linear = nn.Linear(config.image_H * config.image_W * config.image_C, config.num_classes)
-
-    def forward(self, x):
-        x = x.view(x.size(0), -1)
-        return self.linear(x)
 
 class LeNet5(nn.Module):
     def __init__(self,config):
@@ -112,7 +103,8 @@ class FeatureExtractor(nn.Module):
             'lenet5': models.lenet5(pretrained=True),
             'vgg16': models.vgg16(pretrained=True),
             'alexnet': models.alexnet(pretrained=True),
-            'resnet18': models.resnet18(pretrained=True)
+            'resnet18': models.resnet18(pretrained=True),
+            'resnet34': models.resnet34(pretrained=True)
         }
         assert config.model_extract_name in model_dict, f"đéo hỗ trợ model này: {config.model_extract_name}"
         self.cnn = model_dict[config.model_extract_name]
@@ -129,6 +121,44 @@ class FeatureExtractor(nn.Module):
         features = features.view(features.size(0), -1)
         return features
 
+
+class SVM_Model(nn.Module):
+    def __init__(self, config):
+        super(SVM_Model, self).__init__()
+        self.feature_extractor = FeatureExtractor(config)
+        self.num_classes = config.num_classes
+        self.kernel_type = config.kernel_type
+        self.gamma = config.gamma
+        self.degree = config.degree
+        
+        if self.kernel_type == 'linear':
+            self.classifier = nn.Linear(self.feature_extractor.output_size, self.num_classes, bias=False)
+        elif self.kernel_type == 'rbf':
+            self.rbf = nn.RBF(self.feature_extractor.output_size, 1, gamma=self.gamma)
+            self.classifier = nn.Linear(self.rbf.out_features, self.num_classes, bias=False)
+        elif self.kernel_type == 'poly':
+            self.poly = nn.Linear(self.feature_extractor.output_size, self.degree, bias=False)
+            self.classifier = nn.Linear(self.degree, self.num_classes, bias=False)
+        else:
+            raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
+
+    def forward(self, x):
+        x = self.feature_extractor(x)
+        if self.kernel_type == 'linear':
+            x = self.classifier(x)
+        elif self.kernel_type == 'rbf':
+            x = self.rbf(x)
+            x = self.classifier(x)
+        elif self.kernel_type == 'poly':
+            x = self.poly(x)
+            x = x ** self.degree
+            x = self.classifier(x)
+        else:
+            raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
+        return x
+
+
+    
 
 class KMeans_Model:
     def __init__(self, config):
