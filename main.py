@@ -1,6 +1,6 @@
 import argparse
 from get_config import get_config
-from clasify_task import Classify_Task
+from classify_task import Classify_Task
 from clustering_task import Clustering_Task
 parser = argparse.ArgumentParser()
 parser.add_argument("--config-file", type=str, required=True)

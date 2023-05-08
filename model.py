@@ -96,31 +96,31 @@ class NN(nn.Module):
         return x
     
 
+import torch
+import torch.nn as nn
+from sklearn.metrics.pairwise import rbf_kernel
+
 class FeatureExtractor(nn.Module):
     def __init__(self, config):
         super(FeatureExtractor, self).__init__()
-        model_dict = {
-            'lenet5': models.lenet5(pretrained=True),
-            'vgg16': models.vgg16(pretrained=True),
-            'alexnet': models.alexnet(pretrained=True),
-            'resnet18': models.resnet18(pretrained=True),
-            'resnet34': models.resnet34(pretrained=True)
-        }
-        assert config.model_extract_name in model_dict, f"đéo hỗ trợ model này: {config.model_extract_name}"
-        self.cnn = model_dict[config.model_extract_name]
         
-        # Modify the code that removes the last layer of the CNN to be consistent with the structure of the selected CNN model
-        if config.model_extract_name in ['lenet5', 'alexnet']:
-            self.cnn = nn.Sequential(*list(self.cnn.children())[:-1])
-        else:
+        if config.model_extract_name == 'vgg16':
+            self.cnn = models.vgg16(pretrained=True)
             self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
+        elif config.model_extract_name == 'alexnet':
+            self.cnn = models.alexnet(pretrained=True)
+            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
+        elif config.model_extract_name == 'resnet34':
+            self.cnn = models.resnet34(pretrained=True)
+            self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
+        else:
+            print(f"đéo hỗ trợ model này: {config.model_extract_name}")
 
     def forward(self, x):
         features = self.cnn(x)
         # Flatten the features
         features = features.view(features.size(0), -1)
         return features
-
 
 class SVM_Model(nn.Module):
     def __init__(self, config):
@@ -134,31 +134,30 @@ class SVM_Model(nn.Module):
         if self.kernel_type == 'linear':
             self.classifier = nn.Linear(self.feature_extractor.output_size, self.num_classes, bias=False)
         elif self.kernel_type == 'rbf':
-            self.rbf = nn.RBF(self.feature_extractor.output_size, 1, gamma=self.gamma)
-            self.classifier = nn.Linear(self.rbf.out_features, self.num_classes, bias=False)
+            self.classifier = nn.Linear(self.feature_extractor.output_size, self.num_classes, bias=False)
         elif self.kernel_type == 'poly':
             self.poly = nn.Linear(self.feature_extractor.output_size, self.degree, bias=False)
             self.classifier = nn.Linear(self.degree, self.num_classes, bias=False)
         else:
             raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
-
+        
     def forward(self, x):
-        x = self.feature_extractor(x)
+        features = self.feature_extractor(x)
+        
         if self.kernel_type == 'linear':
-            x = self.classifier(x)
+            output = self.classifier(features)
         elif self.kernel_type == 'rbf':
-            x = self.rbf(x)
-            x = self.classifier(x)
+            kernel_matrix = rbf_kernel(features.cpu().numpy(), gamma=self.gamma)
+            kernel_tensor = torch.from_numpy(kernel_matrix).to(features.device)
+            output = self.classifier(kernel_tensor)
         elif self.kernel_type == 'poly':
-            x = self.poly(x)
-            x = x ** self.degree
-            x = self.classifier(x)
+            features = torch.pow(features, self.degree)
+            output = self.classifier(features)
         else:
             raise ValueError(f"không hỗ trợ kernel này: {self.kernel_type}")
-        return x
+        
+        return output
 
-
-    
 
 class KMeans_Model:
     def __init__(self, config):

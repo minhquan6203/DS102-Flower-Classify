@@ -20,7 +20,7 @@ def build_model(config):
 def build_loss_fn(config):
     if config.type_model=="SVM":
         return nn.MultiMarginLoss()
-    if config.type_model=='CNN':
+    if config.type_model=='ResNet':
         return nn.CrossEntropyLoss()
     if config.type_model=="LeNet5":
         return nn.CrossEntropyLoss()

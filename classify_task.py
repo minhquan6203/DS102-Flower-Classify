@@ -17,7 +17,7 @@ class Classify_Task:
         self.learning_rate=config.learning_rate
         self.save_path=config.save_path
         self.dataloader=LoadData(config)
-        self.device = config.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.base_model=build_model(config).to(self.device)
         self.loss_function=build_loss_fn(config)
 
