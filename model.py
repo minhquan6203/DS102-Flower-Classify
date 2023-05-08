@@ -98,7 +98,7 @@ class NN(nn.Module):
 class FeatureExtractor(nn.Module):
     def __init__(self, config):
         super(FeatureExtractor, self).__init__()
-        self.input_shape = (config.image_C,config.image_W, config.image_H)
+        self.input_shape = (config.image_C,config.image_H, config.image_W)
         if config.model_extract_name == 'vgg16':
             self.cnn = models.vgg16(pretrained=True)
             self.cnn = nn.Sequential(*list(self.cnn.children())[:-2])
