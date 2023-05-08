@@ -25,30 +25,41 @@ class Clustering_Task:
         self.base_model.fit(train)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
         print("finished training!!!")
+        print("now let's see if the training is good or not")
+        print("evaluate on train data")
+        clusters = self.base_model.predict(train)
+        y_true = []
+        for _, labels in train:
+            y_true += labels.tolist()
+            
+        accuracy = accuracy_score(y_true, clusters)
+        f1 = f1_score(y_true, clusters, average='macro')
+        cm = confusion_matrix(y_true, clusters)
+
+        print('accuracy: {:.4f}'.format(accuracy))
+        print('f1 score: {:.4f}'.format(f1))
+        print('confusion matrix:')
+        print(cm)
+
 
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
             self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
-            print("evaluate mode after trainingl!!!")
+            print("evaluate model on test datal!!!")
         else:
             print('chưa train model mà đòi test hả?')
-        y_true, y_pred = [], []
-        for images, labels in test_data:
-            outputs = self.base_model.predict(images)
 
-            _, preds = torch.max(outputs, 1)
+        clusters = self.base_model.predict(test_data)
+        y_true = []
+        for _, labels in test_data:
             y_true += labels.tolist()
-            y_pred += preds.tolist()
+            
+        accuracy = accuracy_score(y_true, clusters)
+        f1 = f1_score(y_true, clusters, average='macro')
+        cm = confusion_matrix(y_true, clusters)
 
-        accuracy = accuracy_score(y_true, y_pred)
-        f1 = f1_score(y_true, y_pred, average='macro')
-        print('Test accuracy: {:.4f}'.format(accuracy))
-        print('Test F1 score: {:.4f}'.format(f1))
-        
-        cm = confusion_matrix(y_true, y_pred)
-        print('Confusion matrix:')
+        print('accuracy: {:.4f}'.format(accuracy))
+        print('f1 score: {:.4f}'.format(f1))
+        print('confusion matrix:')
         print(cm)
-
-
-

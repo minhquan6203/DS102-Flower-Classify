@@ -54,7 +54,9 @@ class RBFSVM(nn.Module):
     def forward(self, x):
         x = x.view(-1, self.input_size)
         dists = torch.cdist(x, self.weights, p=2)
-        outputs = torch.exp(-self.gamma * dists ** 2) + self.bias
+        kernel_matrix = torch.exp(-self.gamma * dists ** 2)
+        outputs = kernel_matrix @ self.weights + self.bias
+        # outputs = kernel_matrix  + self.bias
         return outputs
 
 

@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -36,9 +35,9 @@ class KMeans_Model:
             for images, labels in dataloader:
                 images = images.view(images.size(0), -1)
                 features.append(self._to_numpy(images))
-    
-        features = np.concatenate(features)
-        # Fit model 
+        features = np.concatenate(features, axis=0)
+        print(len(features))
+        # Fit model
         self.kmeans.fit(features)
         
     def predict(self, dataloader):
@@ -52,8 +51,7 @@ class KMeans_Model:
             for images, labels in dataloader:
                 images = images.view(images.size(0), -1)
                 features.append(self._to_numpy(images))
-
-        features = np.concatenate(features)
+        features = np.concatenate(features, axis=0)
+        # Predict clusters
         clusters = self.kmeans.predict(features)
-
         return clusters
