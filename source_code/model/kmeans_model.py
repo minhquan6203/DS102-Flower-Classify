@@ -36,7 +36,6 @@ class KMeans_Model:
                 images = images.view(images.size(0), -1)
                 features.append(self._to_numpy(images))
         features = np.concatenate(features, axis=0)
-        print(len(features))
         # Fit model
         self.kmeans.fit(features)
         
