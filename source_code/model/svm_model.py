@@ -52,11 +52,9 @@ class RBFSVM(nn.Module):
         self.bias = nn.Parameter(torch.zeros(num_classes))
 
     def forward(self, x):
-        x = x.view(-1, self.input_size)
         dists = torch.cdist(x, self.weights, p=2)
         kernel_matrix = torch.exp(-self.gamma * dists ** 2)
-        outputs = kernel_matrix @ self.weights + self.bias
-        # outputs = kernel_matrix  + self.bias
+        outputs = kernel_matrix  + self.bias
         return outputs
 
 
@@ -71,7 +69,6 @@ class PolySVM(nn.Module):
         self.bias = nn.Parameter(torch.zeros(num_classes))
 
     def forward(self, x):
-        x = x.view(-1, self.input_size)
         dists = torch.cdist(x, self.weights, p=2)
         kernel_matrix = (self.gamma * dists + 1) ** self.degree
         outputs = kernel_matrix + self.bias
