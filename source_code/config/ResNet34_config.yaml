@@ -1,6 +1,6 @@
-train_path: ./content/Train
-valid_path: ./content/Valid
-test_path: ./content/Test
+train_path: ./dataset/Train
+valid_path: ./dataset/Valid
+test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "ResNet"
 task: "classify"

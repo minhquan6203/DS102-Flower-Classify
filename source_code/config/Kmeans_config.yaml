@@ -1,6 +1,6 @@
-train_path: ./content/Train
-valid_path: ./content/Valid
-test_path: ./content/Test
+train_path: ./dataset/Train
+valid_path: ./dataset/Valid
+test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "Kmeans"
 model_extract_name: "resnet34"
@@ -10,4 +10,3 @@ image_W: 224
 image_H: 224
 num_clusters: 16
 batch_size: 128
-
