@@ -42,15 +42,18 @@ class KMeans_Model:
     def predict(self, dataloader):
         # Extract features
         features = []
+        y_true = []
         if self.feature_extractor is not None:
             for images, labels in dataloader:
+                y_true += labels.tolist()
                 images, labels = images.to(self.device), labels.to(self.device)
                 features.append(self._to_numpy(self.feature_extractor(images)))
         else:
             for images, labels in dataloader:
+                y_true += labels.tolist()
                 images = images.view(images.size(0), -1)
                 features.append(self._to_numpy(images))
         features = np.concatenate(features, axis=0)
         # Predict clusters
         clusters = self.kmeans.predict(features)
-        return clusters
+        return clusters, y_true

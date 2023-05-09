@@ -27,11 +27,8 @@ class Clustering_Task:
         print("finished training!!!")
         print("now let's see if the training is good or not")
         print("evaluate on train data")
-        clusters = self.base_model.predict(train)
-        y_true = []
-        for _, labels in train:
-            y_true += labels.tolist()
-            
+        clusters, y_true = self.base_model.predict(train)
+
         accuracy = accuracy_score(y_true, clusters)
         f1 = f1_score(y_true, clusters, average='macro')
         cm = confusion_matrix(y_true, clusters)
@@ -50,11 +47,7 @@ class Clustering_Task:
         else:
             print('chưa train model mà đòi test hả?')
 
-        clusters = self.base_model.predict(test_data)
-        y_true = []
-        for _, labels in test_data:
-            y_true += labels.tolist()
-            
+        clusters, y_true = self.base_model.predict(test_data)      
         accuracy = accuracy_score(y_true, clusters)
         f1 = f1_score(y_true, clusters, average='macro')
         cm = confusion_matrix(y_true, clusters)

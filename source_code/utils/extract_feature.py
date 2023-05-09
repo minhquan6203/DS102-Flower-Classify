@@ -7,7 +7,6 @@ from transformers import AutoTokenizer, AutoFeatureExtractor
 class FeatureExtractor(nn.Module):
     def __init__(self, config):
         super(FeatureExtractor, self).__init__()
-        self.num_classes = config.num_classes
         self.image_W = config.image_W
         self.image_H = config.image_H
         self.image_C = config.image_C
