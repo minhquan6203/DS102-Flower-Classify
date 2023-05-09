@@ -56,4 +56,4 @@ class KMeans_Model:
         features = np.concatenate(features, axis=0)
         # Predict clusters
         clusters = self.kmeans.predict(features)
-        return clusters, y_true
+        return clusters.tolist(), y_true
