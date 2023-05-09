@@ -10,27 +10,38 @@ class SVM_Model(nn.Module):
         self.image_W = config.image_W
         self.image_H = config.image_H
         self.image_C = config.image_C
+        self.model_extract_name = config.model_extract_name
+        self.kernel_type = config.kernel_type
         self.gamma = config.gamma
         self.degree = config.degree
+        self.r = config.r
         
-        if config.model_extract_name is not None:
+        if self.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config)
-            if config.kernel_type == 'linear':
+            if self.kernel_type == 'linear':
                 self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
-            elif config.kernel_type == 'rbf':
+            elif self.kernel_type == 'rbf':
                 self.classifier = RBFSVM(self.feature_extractor.output_size(), self.num_classes, self.gamma)
-            elif config.kernel_type == 'poly':
-                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.degree)
+            elif self.kernel_type == 'poly':
+                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r, self.degree)
+            elif self.kernel_type == 'sigmoid':
+                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r)
+            elif self.kernel_type == 'custom':
+                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
         else:
             self.feature_extractor = None
-            if config.kernel_type == 'linear':
+            if self.kernel_type == 'linear':
                 self.classifier = nn.Linear(self.image_H*self.image_W*self.image_C, self.num_classes)
-            elif config.kernel_type == 'rbf':
+            elif self.kernel_type == 'rbf':
                 self.classifier = RBFSVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma)
-            elif config.kernel_type == 'poly':
-                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.degree)
+            elif self.kernel_type == 'poly':
+                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r, self.degree)
+            elif self.kernel_type == 'sigmoid':
+                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r) 
+            elif self.kernel_type == 'custom':
+                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
 
@@ -59,17 +70,53 @@ class RBFSVM(nn.Module):
 
 
 class PolySVM(nn.Module):
-    def __init__(self, input_size, num_classes, gamma, degree):
+    def __init__(self, input_size, num_classes, gamma, r, degree):
         super(PolySVM, self).__init__()
         self.input_size = input_size
         self.num_classes = num_classes
         self.gamma = gamma
         self.degree = degree
+        self.r = r
+        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
+        self.bias = nn.Parameter(torch.zeros(num_classes))
+
+    def forward(self, x):
+        # dists = torch.cdist(x, self.weights, p=2)
+        # kernel_matrix = (self.gamma * dists + self.r) ** self.degree #này sai công thức nhưng cho kết quả tốt?
+        kernel_matrix = (self.gamma * torch.mm(x, self.weights.t()) + self.r) ** self.degree
+        outputs = kernel_matrix + self.bias
+        return outputs
+    
+
+class SigmoidSVM(nn.Module):
+    def __init__(self, input_size, num_classes, gamma, r):
+        super(SigmoidSVM, self).__init__()
+        self.input_size = input_size
+        self.num_classes = num_classes
+        self.gamma = gamma
+        self.r = r
+        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
+        self.bias = nn.Parameter(torch.zeros(num_classes))
+
+    def forward(self, x):
+        kernel_matrix = torch.tanh(self.gamma * torch.mm(x, self.weights.t())+ self.r)
+        outputs = kernel_matrix  + self.bias
+        return outputs
+
+
+class CustomSVM(nn.Module):
+    def __init__(self, input_size, num_classes, gamma, r, degree):
+        super(PolySVM, self).__init__()
+        self.input_size = input_size
+        self.num_classes = num_classes
+        self.gamma = gamma
+        self.degree = degree
+        self.r = r
         self.weights = nn.Parameter(torch.randn(num_classes, input_size))
         self.bias = nn.Parameter(torch.zeros(num_classes))
 
     def forward(self, x):
         dists = torch.cdist(x, self.weights, p=2)
-        kernel_matrix = (self.gamma * dists + 1) ** self.degree
+        kernel_matrix = (self.gamma * dists + self.r) ** self.degree #này sai công thức nhưng cho kết quả tốt?
         outputs = kernel_matrix + self.bias
         return outputs
