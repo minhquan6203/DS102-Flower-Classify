@@ -4,7 +4,7 @@ test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "Kmeans"
 model_extract_name: "resnet34"
-max_iter: 5000
+max_iter: 200
 task: "clustering"
 image_C: 3
 image_W: 224

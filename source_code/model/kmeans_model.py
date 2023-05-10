@@ -30,21 +30,21 @@ class KMeans_Model:
         y_true = []
         if self.feature_extractor is not None:
             for images, labels in dataloader:
-                y_true += labels.tolist()
+                y_true.append(self._to_numpy(labels))
                 images = images.to(self.device)
                 features.append(self._to_numpy(self.feature_extractor(images)))
         else:
             for images, labels in dataloader:
                 images = images.view(images.size(0), -1)
-                y_true += labels.tolist()
+                y_true.append(self._to_numpy(labels))
                 features.append(self._to_numpy(images))
         features = np.concatenate(features, axis=0)
-
+        y_true = np.concatenate(y_true, axis=0)
         return features, y_true
     
     def fit(self, features, y_true = None):
         self.kmeans.fit(features, y_true)
         
-    def predict(self, features, ):
+    def predict(self, features):
         clusters = self.kmeans.predict(features)
         return clusters

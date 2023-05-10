@@ -24,7 +24,7 @@ class Clustering_Task:
           os.makedirs(self.save_path)
 
         train = self.dataloader.load_data(data_path = self.train_path)
-        features, labels = KMeans_Model.get_features(train)
+        features, labels = self.base_model.get_features(train)
         print('training, please waiting!!!')
         self.base_model.fit(features, labels)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
@@ -32,7 +32,7 @@ class Clustering_Task:
 
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path = self.test_path)
-        features, labels = KMeans_Model.get_features(test_data)
+        features, labels = self.base_model.get_features(test_data)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
             self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
             print("evaluate model on test datal!!!")
