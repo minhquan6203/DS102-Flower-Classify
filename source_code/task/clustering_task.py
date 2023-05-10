@@ -1,6 +1,6 @@
 from model.kmeans_model import KMeans_Model
 from data_loader.loaddata import LoadData
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, accuracy_score
 from utils.builder import build_model
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,34 +24,27 @@ class Clustering_Task:
           os.makedirs(self.save_path)
 
         train = self.dataloader.load_data(data_path = self.train_path)
+        features, labels = KMeans_Model.get_features(train)
         print('training, please waiting!!!')
-        self.base_model.fit(train)
+        self.base_model.fit(features, labels)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
         print("finished training!!!")
 
-    def evaluate_on_test(self):
-        test_data = self.dataloader.load_test_data(data_path=self.test_path)
+    def evaluate(self):
+        test_data = self.dataloader.load_test_data(data_path = self.test_path)
+        features, labels = KMeans_Model.get_features(test_data)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
             self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
             print("evaluate model on test datal!!!")
         else:
             print('chưa train model mà đòi test hả?')
 
-        #Calculate SSE
-        clusters, features,_ = self.base_model.predict(test_data)
-        centers = self.base_model.cluster_centers_
-        distances = np.sum((features - centers[clusters]) ** 2, axis=1)
-        sse = np.sum(distances)
+        clusters = self.base_model.predict(features)
     
         # Calculate Silhouette Coefficient
         sil_score = silhouette_score(features, clusters, metric='euclidean')
 
-        print('sse:', sse)
         print('silhouette score: ',sil_score)
-
-        plt.figure(figsize=(10, 10))
-        sns.scatterplot(x=features[:, 0], y=features[:, 1], hue=clusters, palette='bright')
-        plt.title('Clustering visualization')
-        plt.show()
+        print('acc: ',accuracy_score(clusters,labels))
     
 
