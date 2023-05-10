@@ -16,7 +16,7 @@ class KMeans_Model:
         else:
             self.feature_extractor = None
 
-        self.kmeans = KMeans(n_clusters=self.num_clusters)
+        self.kmeans = KMeans(n_clusters=self.num_clusters, max_iter=1000, tol=0.0001, verbose=1)
         
     def _to_numpy(self, tensor):
         if self.device.type == 'cuda':
@@ -45,15 +45,16 @@ class KMeans_Model:
         y_true = []
         if self.feature_extractor is not None:
             for images, labels in dataloader:
-                y_true += labels.tolist()
+                y_true.append(labels)
                 images, labels = images.to(self.device), labels.to(self.device)
                 features.append(self._to_numpy(self.feature_extractor(images)))
         else:
             for images, labels in dataloader:
-                y_true += labels.tolist()
+                y_true.append(labels)
                 images = images.view(images.size(0), -1)
                 features.append(self._to_numpy(images))
         features = np.concatenate(features, axis=0)
+        labels =np.concatenate(labels, axis=0)
         # Predict clusters
         clusters = self.kmeans.predict(features)
-        return clusters.tolist(), y_true
+        return clusters, features, y_true

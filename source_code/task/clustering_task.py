@@ -1,9 +1,12 @@
 from model.kmeans_model import KMeans_Model
 from data_loader.loaddata import LoadData
-from sklearn.metrics import f1_score, confusion_matrix,accuracy_score
+from sklearn.metrics import silhouette_score
 from utils.builder import build_model
+import matplotlib.pyplot as plt
+import seaborn as sns
 import torch
 import os
+import numpy as np
 from joblib import dump
 import joblib
 
@@ -25,21 +28,8 @@ class Clustering_Task:
         self.base_model.fit(train)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
         print("finished training!!!")
-        print("now let's see if the training is good or not")
-        print("evaluate on train data")
-        clusters, y_true = self.base_model.predict(train)
 
-        accuracy = accuracy_score(y_true, clusters)
-        f1 = f1_score(y_true, clusters, average='macro')
-        cm = confusion_matrix(y_true, clusters)
-
-        print('accuracy: {:.4f}'.format(accuracy))
-        print('f1 score: {:.4f}'.format(f1))
-        print('confusion matrix:')
-        print(cm)
-
-
-    def evaluate(self):
+    def evaluate_on_test(self):
         test_data = self.dataloader.load_test_data(data_path=self.test_path)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
             self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
@@ -47,12 +37,21 @@ class Clustering_Task:
         else:
             print('chưa train model mà đòi test hả?')
 
-        clusters, y_true = self.base_model.predict(test_data)      
-        accuracy = accuracy_score(y_true, clusters)
-        f1 = f1_score(y_true, clusters, average='macro')
-        cm = confusion_matrix(y_true, clusters)
+        #Calculate SSE
+        clusters, features,_ = self.base_model.predict(test_data)
+        centers = self.base_model.cluster_centers_
+        distances = np.sum((features - centers[clusters]) ** 2, axis=1)
+        sse = np.sum(distances)
+    
+        # Calculate Silhouette Coefficient
+        sil_score = silhouette_score(features, clusters, metric='euclidean')
 
-        print('accuracy: {:.4f}'.format(accuracy))
-        print('f1 score: {:.4f}'.format(f1))
-        print('confusion matrix:')
-        print(cm)
+        print('sse:', sse)
+        print('silhouette score: ',sil_score)
+
+        plt.figure(figsize=(10, 10))
+        sns.scatterplot(x=features[:, 0], y=features[:, 1], hue=clusters, palette='bright')
+        plt.title('Clustering visualization')
+        plt.show()
+    
+
