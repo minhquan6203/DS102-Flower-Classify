@@ -3,6 +3,7 @@ valid_path: ./dataset/Valid
 test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "Transformer"
+aug: True
 model_name_or_path: google/vit-base-patch16-224-in21k
 task: "classify"
 patience: 5

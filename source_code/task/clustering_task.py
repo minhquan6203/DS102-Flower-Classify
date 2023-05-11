@@ -29,6 +29,12 @@ class Clustering_Task:
         self.base_model.fit(features, labels)
         dump(self.base_model, self.save_path + 'kmeans_model.pkl')
         print("finished training!!!")
+        print("let see if training is good or not!!!")
+        clusters = self.base_model.predict(features)
+        # Calculate Silhouette Coefficient
+        sil_score = silhouette_score(features, clusters, metric='euclidean')
+        print('silhouette score: ',sil_score)
+        print('acc: ',accuracy_score(clusters,labels))
 
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path = self.test_path)

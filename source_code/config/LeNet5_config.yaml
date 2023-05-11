@@ -3,6 +3,7 @@ valid_path: /content/ML-basic/mnist/val
 test_path: /content/ML-basic/mnist/val
 save_path: /content/save/
 type_model: "LeNet5"
+aug: True
 task: "classify"
 patience: 5
 image_C: 3

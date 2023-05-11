@@ -7,7 +7,7 @@ class LoadData:
         self.image_H = config.image_H
         self.image_W = config.image_W
         self.batch_size = config.batch_size
-        
+        self.aug = config.aug
     def __len__(self):
             return len(self.data)
 
@@ -18,13 +18,21 @@ class LoadData:
         return img, label
 
     def load_data(self, data_path):
-        transform = transforms.Compose([
-            transforms.Resize((self.image_H, self.image_W)),
-            transforms.RandomCrop(size=(self.image_H, self.image_W), padding=4),       
-            transforms.RandomRotation(10),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-        ])
+        if self.aug:
+            transform = transforms.Compose([
+                transforms.Resize((self.image_H, self.image_W)),
+                transforms.RandomCrop(size=(self.image_H, self.image_W), padding=4),       
+                transforms.RandomRotation(10),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+        else:
+            transform = transforms.Compose([
+                transforms.Resize((self.image_H, self.image_W)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+             
 
         dataset = torchvision.datasets.ImageFolder(
             root=data_path,
@@ -44,7 +52,7 @@ class LoadData:
         transform = transforms.Compose([
             transforms.Resize((self.image_H, self.image_W)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]) 
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
         ])
 
         dataset = torchvision.datasets.ImageFolder(

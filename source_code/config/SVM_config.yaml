@@ -3,6 +3,7 @@ valid_path: ./dataset/Valid
 test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "SVM"
+aug: True
 model_extract_name: "resnet34"
 kernel_type: "rbf"
 gamma: 0.1
