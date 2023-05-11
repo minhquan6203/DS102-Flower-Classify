@@ -11,13 +11,14 @@ class KMeans_Model:
         self.num_clusters = config.num_clusters
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.max_iter = config.max_iter
+        self.mini_batch = config.mini_batch
         
         if config.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config).to(self.device)
         else:
             self.feature_extractor = None
 
-        self.kmeans = KMeans(n_clusters=self.num_clusters, max_iter=self.max_iter, tol=0.0001, verbose=1)
+        self.kmeans = KMeans(n_clusters=self.num_clusters, max_iter=self.max_iter, tol=0.0001, verbose=1, minibatch = self.mini_batch)
               
     def get_features(self, dataloader):
         features = []

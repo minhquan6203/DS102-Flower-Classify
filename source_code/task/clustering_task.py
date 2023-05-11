@@ -28,20 +28,19 @@ class Clustering_Task:
         print('training, please waiting!!!')
         self.base_model.fit(features)
         print("finished training!!!")
-        torch.save({'model_state_dict': self.base_model.state_dict()},os.path.join(self.save_path,'kmeans_model.pth'))
-
-    def evaluate(self):
-        test_data = self.dataloader.load_test_data(data_path = self.test_path)
-        features, labels = self.base_model.get_features(test_data)
-        if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pth')):
-            checkpoint = torch.load(os.path.join(self.save_path, 'kmeans_model.pth'), map_location=self.device)
-            self.base_model.load_state_dict(checkpoint['model_state_dict'])
-            print("evaluate model on test datal!!!")
-        else:
-            print('chưa train model mà đòi test hả?')
-
+        print('let see if training is good or not')
         clusters = self.base_model.predict(features)
-    
-        print('acc: ',accuracy_score(clusters,labels))
+        sil_score = silhouette_score(features.cpu(), clusters.cpu(), metric='euclidean')
+        print("silhouette score",sil_score)
+
+        print('now, evaluate on test data')
+        test = self.dataloader.load_data(data_path = self.test_path)
+        test_f,test_l = self.base_model.get_features(test)
+        t_clusters = self.base_model.predict(test_f)
+        t_sil_score = silhouette_score(test_f.cpu(), t_clusters.cpu(), metric='euclidean')
+        print("silhouette score",t_sil_score)
+       
+
+
     
 

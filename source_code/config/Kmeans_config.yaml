@@ -3,8 +3,9 @@ valid_path: ./dataset/Valid
 test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "Kmeans"
-model_extract_name: "resnet34"
+model_extract_name: null
 max_iter: 100
+mini_batch: null
 task: "clustering"
 image_C: 3
 image_W: 224
