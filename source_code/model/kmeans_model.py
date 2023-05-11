@@ -33,8 +33,8 @@ class KMeans_Model:
                 images, labels = images.to(self.device), labels.to(self.device)
                 y_true.append(labels)
                 features.append(images)
-        features = np.concatenate(features, axis=0)
-        y_true = np.concatenate(y_true, axis=0)
+        features = torch.cat(features, dim=0)
+        y_true = torch.cat(y_true, dim=0)
         return features, y_true
     
     def fit(self, features):

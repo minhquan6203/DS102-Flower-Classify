@@ -3,8 +3,8 @@ import torch
 from torch.nn.functional import normalize
 from time import time
 import numpy as np
-from init_method_kmeans import init_methods
-
+from utils.init_method_kmeans import init_methods
+import pynvml
 class KMeans:
   '''
   Kmeans clustering algorithm implemented with PyTorch
@@ -52,7 +52,7 @@ class KMeans:
       raise NotImplementedError()
 
     try:
-      import pynvml
+      import PYNVML
       self._pynvml_exist = True
     except ModuleNotFoundError:
       self._pynvml_exist = False

@@ -27,24 +27,21 @@ class Clustering_Task:
         features, labels = self.base_model.get_features(train)
         print('training, please waiting!!!')
         self.base_model.fit(features)
-        dump(self.base_model, self.save_path + 'kmeans_model.pth')
         print("finished training!!!")
+        torch.save({'model_state_dict': self.base_model.state_dict()},os.path.join(self.save_path,'kmeans_model.pth'))
 
     def evaluate(self):
         test_data = self.dataloader.load_test_data(data_path = self.test_path)
         features, labels = self.base_model.get_features(test_data)
         if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pth')):
-            self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pth'))
+            checkpoint = torch.load(os.path.join(self.save_path, 'kmeans_model.pth'), map_location=self.device)
+            self.base_model.load_state_dict(checkpoint['model_state_dict'])
             print("evaluate model on test datal!!!")
         else:
             print('chưa train model mà đòi test hả?')
 
         clusters = self.base_model.predict(features)
     
-        # Calculate Silhouette Coefficient
-        sil_score = silhouette_score(features, clusters, metric='euclidean')
-
-        print('silhouette score: ',sil_score)
         print('acc: ',accuracy_score(clusters,labels))
     
 
