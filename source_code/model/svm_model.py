@@ -15,7 +15,7 @@ class SVM_Model(nn.Module):
         self.gamma = config.gamma
         self.degree = config.degree
         self.r = config.r
-        
+        self.dropout = nn.Dropout(0.3)
         if self.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config)
             if self.kernel_type == 'linear':
@@ -45,7 +45,6 @@ class SVM_Model(nn.Module):
             else:
                 raise ValueError('không hỗ trợ kernel này')
             
-            self.dropout = nn.Dropout(0.3)
 
     def forward(self, x):
         if self.feature_extractor is not None:

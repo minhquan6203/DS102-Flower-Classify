@@ -9,13 +9,14 @@ class ResNet34_Model(nn.Module): #use ResNet34
         super(ResNet34_Model, self).__init__()
         self.num_classes = config.num_classes
         self.feature_extractor = FeatureExtractor(config)
-        self.classify = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
+        self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
         self.dropout = nn.Dropout(0.3)
 
     def forward(self, x):
         x = self.feature_extractor(x)
         x = self.dropout(x)
         x = self.classifier(x)
+        x = torch.softmax(x, dim=1)
         return x
 
 class LeNet5(nn.Module):
