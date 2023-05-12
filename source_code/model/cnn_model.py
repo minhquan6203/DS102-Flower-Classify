@@ -4,20 +4,18 @@ import torch.nn.functional as F
 import torchvision.models as models
 from utils.extract_feature import FeatureExtractor
 
-class ResNet34_Model(nn.Module): #use ResNet34
+class ResNet34_Model(nn.Module):
     def __init__(self, config):
         super(ResNet34_Model, self).__init__()
         self.num_classes = config.num_classes
-        self.feature_extractor = FeatureExtractor(config)
-        self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
-        self.dropout = nn.Dropout(0.3)
-
+        self.cnn = models.resnet34(pretrained=True)
+        self.cnn.fc = nn.Linear(self.cnn.fc.in_features, self.num_classes)
+        
     def forward(self, x):
-        x = self.feature_extractor(x)
-        x = self.dropout(x)
-        x = self.classifier(x)
+        x = self.cnn(x)
         x = torch.softmax(x, dim=1)
         return x
+
 
 class LeNet5(nn.Module):
     def __init__(self,config):
