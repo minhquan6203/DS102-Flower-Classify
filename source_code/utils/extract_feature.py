@@ -24,9 +24,15 @@ class FeatureExtractor(nn.Module):
         else:
             print(f"chưa hỗ trợ model này: {config.model_extract_name}")
 
+        for param in self.cnn.parameters():
+            param.requires_grad = False
+
+        self.dropout = nn.Dropout(0.3)
+    
     def forward(self, x):
         features = self.cnn(x)
         features = features.view(features.size(0), -1)
+        features = self.dropout(features)
         return features
     
     def output_size(self):

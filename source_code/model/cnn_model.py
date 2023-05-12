@@ -10,10 +10,15 @@ class ResNet34_Model(nn.Module): #use ResNet34
         self.num_classes = config.num_classes
         
         self.resnet = models.resnet34(pretrained=True)
+        for param in self.resnet.parameters():
+            param.requires_grad = False
+
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, self.num_classes)
+        self.dropout = nn.Dropout(0.3)
 
     def forward(self, x):
         x = self.resnet(x)
+        x = self.dropout(x)
         x = torch.softmax(x, dim=1)
         return x
 
