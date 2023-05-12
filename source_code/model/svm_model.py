@@ -44,12 +44,15 @@ class SVM_Model(nn.Module):
                 self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
+            
+            self.dropout = nn.Dropout(0.3)
 
     def forward(self, x):
         if self.feature_extractor is not None:
             x = self.feature_extractor(x)
         else:
             x = x.view(x.size(0), -1)
+        x = self.dropout(x)
         out = self.classifier(x)
         return out
 

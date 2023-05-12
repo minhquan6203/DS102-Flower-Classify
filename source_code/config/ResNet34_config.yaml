@@ -3,6 +3,7 @@ valid_path: ./dataset/Valid
 test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "ResNet"
+model_extract_name: "resnet34"
 aug: True
 task: "classify"
 patience: 5
