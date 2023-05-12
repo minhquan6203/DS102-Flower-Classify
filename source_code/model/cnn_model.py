@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-from utils.extract_feature import FeatureExtractor
 
 class ResNet34_Model(nn.Module):
     def __init__(self, config):

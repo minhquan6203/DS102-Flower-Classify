@@ -15,7 +15,6 @@ class SVM_Model(nn.Module):
         self.gamma = config.gamma
         self.degree = config.degree
         self.r = config.r
-        self.dropout = nn.Dropout(0.3)
         if self.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config)
             if self.kernel_type == 'linear':
@@ -51,7 +50,6 @@ class SVM_Model(nn.Module):
             x = self.feature_extractor(x)
         else:
             x = x.view(x.size(0), -1)
-        x = self.dropout(x)
         out = self.classifier(x)
         return out
 
