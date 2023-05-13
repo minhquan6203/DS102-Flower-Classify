@@ -53,6 +53,7 @@ class SVM_Model(nn.Module):
         out = self.classifier(x)
         return out
 
+
 class RBFSVM(nn.Module):
     def __init__(self, input_size, num_classes, gamma):
         super(RBFSVM, self).__init__()

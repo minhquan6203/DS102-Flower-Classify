@@ -27,7 +27,7 @@ class FeatureExtractor(nn.Module):
         for param in self.cnn.parameters():
             param.requires_grad = False
 
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.2)
     
     def forward(self, x):
         features = self.cnn(x)

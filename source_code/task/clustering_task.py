@@ -1,4 +1,4 @@
-from model.kmeans_model import KMeans_Model
+from model.kmeans_model import KMeans
 from data_loader.loaddata import LoadData
 from sklearn.metrics import silhouette_score, accuracy_score
 from utils.builder import build_model
@@ -19,38 +19,32 @@ class Clustering_Task:
         self.dataloader = LoadData(config)
         self.base_model = build_model(config)
 
-    def training(self):
+    def training_and_eval(self):
         if not os.path.exists(self.save_path):
           os.makedirs(self.save_path)
 
         train = self.dataloader.load_data(data_path = self.train_path)
+        print('load features...')
         features, labels = self.base_model.get_features(train)
         print('training, please waiting!!!')
-        self.base_model.fit(features, labels)
-        dump(self.base_model, self.save_path + 'kmeans_model.pkl')
-        print("finished training!!!")
-        print("let see if training is good or not!!!")
+        self.base_model.fit(features)
+        print("finished training...")
+        print('let see if training is good or not')
+        print('predicting...')
         clusters = self.base_model.predict(features)
-        # Calculate Silhouette Coefficient
-        sil_score = silhouette_score(features, clusters, metric='euclidean')
-        print('silhouette score: ',sil_score)
-        print('acc: ',accuracy_score(clusters,labels))
+        sil_score = silhouette_score(features.cpu(), clusters.cpu(), metric='euclidean')
+        print("silhouette score",sil_score)
 
-    def evaluate(self):
-        test_data = self.dataloader.load_test_data(data_path = self.test_path)
-        features, labels = self.base_model.get_features(test_data)
-        if os.path.exists(os.path.join(self.save_path, 'kmeans_model.pkl')):
-            self.base_model = joblib.load(os.path.join(self.save_path, 'kmeans_model.pkl'))
-            print("evaluate model on test datal!!!")
-        else:
-            print('chưa train model mà đòi test hả?')
+        print('now, evaluate on test data')
+        test = self.dataloader.load_data(data_path = self.test_path)
+        print('load features...')
+        test_f,test_l = self.base_model.get_features(test)
+        print('predicting...')
+        t_clusters = self.base_model.predict(test_f)
+        t_sil_score = silhouette_score(test_f.cpu(), t_clusters.cpu(), metric='euclidean')
+        print("silhouette score",t_sil_score)
+       
 
-        clusters = self.base_model.predict(features)
-    
-        # Calculate Silhouette Coefficient
-        sil_score = silhouette_score(features, clusters, metric='euclidean')
 
-        print('silhouette score: ',sil_score)
-        print('acc: ',accuracy_score(clusters,labels))
     
 
