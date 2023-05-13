@@ -35,6 +35,7 @@ class KMeans_Model:
                 y_true.append(labels)
                 features.append(images)
         features = torch.cat(features, dim=0)
+        features = (features - torch.mean(features)) / torch.std(features)
         y_true = torch.cat(y_true, dim=0)
         return features, y_true
     

@@ -15,6 +15,6 @@ image_C: 3
 image_W: 224
 image_H: 224
 num_classes: 16
-batch_size: 256
+batch_size: 512
 learning_rate: 0.001
 num_epochs: 100

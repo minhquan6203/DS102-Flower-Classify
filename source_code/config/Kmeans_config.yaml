@@ -12,4 +12,4 @@ image_C: 3
 image_W: 224
 image_H: 224
 num_clusters: 16
-batch_size: 256
+batch_size: 512
