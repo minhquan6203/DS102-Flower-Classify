@@ -6,10 +6,10 @@ type_model: "Kmeans"
 aug: False
 mini_batch: 256
 model_extract_name: "resnet34"
-max_iter: 200
+max_iter: 10000
 task: "clustering"
 image_C: 3
 image_W: 224
 image_H: 224
 num_clusters: 16
-batch_size: 128
+batch_size: 512
