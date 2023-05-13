@@ -28,11 +28,9 @@ class FeatureExtractor(nn.Module):
             param.requires_grad = False
 
         self.dropout = nn.Dropout(0.2)
-        self.avg_pool = nn.AdaptiveAvgPool2d((self.image_H, self.image_W))
     
     def forward(self, x):
         features = self.cnn(x)
-        features = self.avg_pool(features)
         features = features.view(features.size(0), -1)
         features = self.dropout(features)
         return features
