@@ -18,7 +18,7 @@ class SVM_Model(nn.Module):
         if self.model_extract_name is not None:
             self.feature_extractor = FeatureExtractor(config)
             if self.kernel_type == 'linear':
-                self.classifier = nn.Linear(self.feature_extractor.output_size(), self.num_classes)
+                self.classifier = LinearSVM(self.feature_extractor.output_size(), self.num_classes)
             elif self.kernel_type == 'rbf':
                 self.classifier = RBFSVM(self.feature_extractor.output_size(), self.num_classes, self.gamma)
             elif self.kernel_type == 'poly':
@@ -32,7 +32,7 @@ class SVM_Model(nn.Module):
         else:
             self.feature_extractor = None
             if self.kernel_type == 'linear':
-                self.classifier = nn.Linear(self.image_H*self.image_W*self.image_C, self.num_classes)
+                self.classifier = LinearSVM(self.image_H*self.image_W*self.image_C, self.num_classes)
             elif self.kernel_type == 'rbf':
                 self.classifier = RBFSVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma)
             elif self.kernel_type == 'poly':
@@ -52,6 +52,18 @@ class SVM_Model(nn.Module):
             x = x.view(x.size(0), -1)
         out = self.classifier(x)
         return out
+
+
+class LinearSVM(nn.Module):
+    def __init__(self, input_size, num_classes):
+        super(LinearSVM, self).__init__()
+        self.num_classes = num_classes
+        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
+        self.bias = nn.Parameter(torch.zeros(num_classes))
+
+    def forward(self, x):
+        outputs = torch.matmul(x, self.weights.t()) + self.bias
+        return outputs
 
 
 class RBFSVM(nn.Module):
