@@ -5,7 +5,7 @@ save_path: /content/save/
 type_model: "SVM"
 aug: True
 model_extract_name: "resnet34"
-kernel_type: "rbf"
+kernel_type: "poly"
 gamma: 0.1
 degree: 2
 r: 1
@@ -16,5 +16,5 @@ image_W: 224
 image_H: 224
 num_classes: 16
 batch_size: 512
-learning_rate: 0.001
+learning_rate: 0.1
 num_epochs: 100
