@@ -26,7 +26,7 @@ class SVM_Model(nn.Module):
             elif self.kernel_type == 'sigmoid':
                 self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r)
             elif self.kernel_type == 'custom':
-                self.classifier = PolySVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r, self.degree)
+                self.classifier = CustomSVM(self.feature_extractor.output_size(), self.num_classes, self.gamma, self.r, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
         else:
@@ -40,7 +40,7 @@ class SVM_Model(nn.Module):
             elif self.kernel_type == 'sigmoid':
                 self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r) 
             elif self.kernel_type == 'custom':
-                self.classifier = PolySVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r, self.degree)
+                self.classifier = CustomSVM(self.image_H*self.image_W*self.image_C, self.num_classes, self.gamma, self.r, self.degree)
             else:
                 raise ValueError('không hỗ trợ kernel này')
             
@@ -77,7 +77,8 @@ class RBFSVM(nn.Module):
 
     def forward(self, x):
         dists = torch.cdist(x, self.weights, p=2)
-        kernel_matrix = torch.exp(-self.gamma * dists ** 2)
+        dists_normalized = (dists - torch.mean(dists)) / torch.std(dists)
+        kernel_matrix = torch.exp(-self.gamma * dists_normalized ** 2)
         outputs = kernel_matrix  + self.bias
         return outputs
 
@@ -119,7 +120,7 @@ class SigmoidSVM(nn.Module):
 
 class CustomSVM(nn.Module):
     def __init__(self, input_size, num_classes, gamma, r, degree):
-        super(PolySVM, self).__init__()
+        super(CustomSVM, self).__init__()
         self.input_size = input_size
         self.num_classes = num_classes
         self.gamma = gamma
