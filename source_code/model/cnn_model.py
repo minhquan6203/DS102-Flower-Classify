@@ -7,7 +7,7 @@ class ResNet34_Model(nn.Module):
     def __init__(self, config):
         super(ResNet34_Model, self).__init__()
         self.num_classes = config.num_classes
-        self.cnn = models.resnet34(pretrained=True)
+        self.cnn = models.resnet34(pretrained=config.load_pretrained)
         self.cnn.fc = nn.Linear(self.cnn.fc.in_features, self.num_classes)
         
     def forward(self, x):

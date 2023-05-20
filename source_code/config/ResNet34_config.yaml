@@ -3,6 +3,7 @@ valid_path: ./dataset/Valid
 test_path: ./dataset/Test
 save_path: /content/save/
 type_model: "ResNet"
+load_pretrained: True
 aug: True
 task: "classify"
 patience: 5
