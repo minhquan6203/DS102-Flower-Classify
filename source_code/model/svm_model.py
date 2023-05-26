@@ -58,8 +58,8 @@ class LinearSVM(nn.Module):
     def __init__(self, input_size, num_classes):
         super(LinearSVM, self).__init__()
         self.num_classes = num_classes
-        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
-        self.bias = nn.Parameter(torch.zeros(num_classes))
+        self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
+        self.bias = nn.Parameter(torch.zeros(self.num_classes))
 
     def forward(self, x):
         outputs = torch.matmul(x, self.weights.t()) + self.bias
@@ -72,8 +72,8 @@ class RBFSVM(nn.Module):
         self.input_size = input_size
         self.num_classes = num_classes
         self.gamma = gamma
-        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
-        self.bias = nn.Parameter(torch.zeros(num_classes))
+        self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
+        self.bias = nn.Parameter(torch.zeros(self.num_classes))
 
     def forward(self, x):
         dists = torch.cdist(x, self.weights, p=2)
@@ -91,8 +91,8 @@ class PolySVM(nn.Module):
         self.gamma = gamma
         self.degree = degree
         self.r = r
-        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
-        self.bias = nn.Parameter(torch.zeros(num_classes))
+        self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
+        self.bias = nn.Parameter(torch.zeros(self.num_classes))
 
     def forward(self, x):
         # dists = torch.cdist(x, self.weights, p=2)
@@ -109,8 +109,8 @@ class SigmoidSVM(nn.Module):
         self.num_classes = num_classes
         self.gamma = gamma
         self.r = r
-        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
-        self.bias = nn.Parameter(torch.zeros(num_classes))
+        self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
+        self.bias = nn.Parameter(torch.zeros(self.num_classes))
 
     def forward(self, x):
         kernel_matrix = torch.tanh(self.gamma * torch.mm(x, self.weights.t())+ self.r)
@@ -126,8 +126,8 @@ class CustomSVM(nn.Module):
         self.gamma = gamma
         self.degree = degree
         self.r = r
-        self.weights = nn.Parameter(torch.randn(num_classes, input_size))
-        self.bias = nn.Parameter(torch.zeros(num_classes))
+        self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
+        self.bias = nn.Parameter(torch.zeros(self.num_classes))
 
     def forward(self, x):
         dists = torch.cdist(x, self.weights, p=2)
