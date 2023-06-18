@@ -16,6 +16,7 @@ if config.task == 'classify':
     task = Classify_Task(config)
     task.training()
     task.evaluate() 
+    task.demo()
 if config.task == 'clustering':
     task = Clustering_Task(config)
     task.training_and_eval()

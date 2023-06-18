@@ -58,6 +58,7 @@ class LinearSVM(nn.Module):
     def __init__(self, input_size, num_classes):
         super(LinearSVM, self).__init__()
         self.num_classes = num_classes
+        self.input_size=input_size
         self.weights = nn.Parameter(torch.randn(self.num_classes, self.input_size))
         self.bias = nn.Parameter(torch.zeros(self.num_classes))
 

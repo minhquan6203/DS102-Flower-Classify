@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import os
-
+import requests
+from PIL import Image
+from io import BytesIO
+import torchvision.transforms as transforms
 from data_loader.loaddata import LoadData
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score
 from utils.builder import build_model,build_loss_fn
@@ -147,3 +150,44 @@ class Classify_Task:
         print('confusion matrix:')
         print(cm)
 
+
+    def demo(self):
+        transform = transforms.Compose([
+            transforms.Resize((self.image_H, self.image_W)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
+        ])
+
+        url = "https://icdn.dantri.com.vn/thumb_w/640/2021/05/27/hoa-cam-tu-cau-lang-son-8-1622082961519.jpg"
+        response = requests.get(url)
+        image = Image.open(BytesIO(response.content))
+        transformed_image = transform(image)
+        transformed_image = transformed_image.to(self.device)
+        if os.path.exists(os.path.join(self.save_path, 'best_model.pth')):
+            checkpoint = torch.load(os.path.join(self.save_path, 'best_model.pth'), map_location=self.device)
+            self.base_model.load_state_dict(checkpoint['model_state_dict'])
+        else:
+            print('chưa train model mà đòi demo hả')
+        self.base_model.eval()
+        true_labels = ['hoa_cam_tu_cau',
+                        'hoa_rum',
+                        'hoa_hong',
+                        'hoa_phong_lan',
+                        'hoa_lily',
+                        'hoa_huong_duong',
+                        'hoa_da_quy',
+                        'hoa_bo_cong_anh',
+                        'hoa_bi_ngan',
+                        'hoa_buom',
+                        'hoa_cam_chuong',
+                        'hoa_giay',
+                        'hoa_sen',
+                        'hoa_phuong',
+                        'hoa_dao',
+                        'hoa_mai']
+        
+        output = self.base_model(transformed_image)
+        label_index = output.argmax(1)
+        label=true_labels[label_index]
+        image.show()
+        print('đây là hoa: ', label)
