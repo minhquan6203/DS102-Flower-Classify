@@ -14,16 +14,18 @@ class Classify_Task:
     def __init__(self, config):
         self.num_epochs = config.num_epochs
         self.patience = config.patience
+        self.image_H = config.image_H
+        self.image_W = config.image_W
         self.train_path = config.train_path
         self.valid_path = config.valid_path
         self.test_path = config.test_path
         self.learning_rate = config.learning_rate
         self.save_path = config.save_path
         self.dataloader = LoadData(config)
+        self.url_demo =config.url_demo
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.base_model = build_model(config).to(self.device)
         self.loss_function = build_loss_fn(config)
-
     def training(self):
         if not os.path.exists(self.save_path):
           os.makedirs(self.save_path)
@@ -158,8 +160,7 @@ class Classify_Task:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
         ])
 
-        url = "https://icdn.dantri.com.vn/thumb_w/640/2021/05/27/hoa-cam-tu-cau-lang-son-8-1622082961519.jpg"
-        response = requests.get(url)
+        response = requests.get(self.url_demo)
         image = Image.open(BytesIO(response.content))
         transformed_image = transform(image)
         transformed_image = transformed_image.to(self.device)
@@ -185,8 +186,8 @@ class Classify_Task:
                         'hoa_phuong',
                         'hoa_dao',
                         'hoa_mai']
-        
-        output = self.base_model(transformed_image)
+        true_labels=sorted(true_labels)
+        output = self.base_model(transformed_image.unsqueeze(0))
         label_index = output.argmax(1)
         label=true_labels[label_index]
         image.show()

@@ -1,6 +1,7 @@
 train_path: ./dataset/Train
 valid_path: ./dataset/Valid
 test_path: ./dataset/Test
+url_demo: https://icdn.dantri.com.vn/thumb_w/640/2021/05/27/hoa-cam-tu-cau-lang-son-8-1622082961519.jpg
 save_path: /content/save/
 type_model: "SVM"
 aug: True

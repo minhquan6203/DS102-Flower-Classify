@@ -1,6 +1,7 @@
 train_path: /content/ML-basic/mnist/train
 valid_path: /content/ML-basic/mnist/val
 test_path: /content/ML-basic/mnist/val
+url_demo: https://icdn.dantri.com.vn/thumb_w/640/2021/05/27/hoa-cam-tu-cau-lang-son-8-1622082961519.jpg
 save_path: /content/save/
 type_model: "LeNet5"
 aug: True
