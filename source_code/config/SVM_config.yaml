@@ -6,7 +6,7 @@ save_path: /content/save/
 type_model: "SVM"
 aug: True
 model_extract_name: "resnet34"
-kernel_type: "poly"
+kernel_type: "custom"
 gamma: 0.1
 degree: 2
 r: 1
